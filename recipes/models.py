@@ -15,11 +15,12 @@ class Tag(models.Model):
         :see: https://stackoverflow.com/a/3943023
         :return: str
         """
-        r = r"(\d+),\s*(\d+),\s*(\d+)"
+        r = r"rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)"
         (red, green, blue) = re.match(r, self.color).groups()
+
         return (
             self.DARK
-            if (red * 0.299 + green * 0.587 + blue * 0.114) > 186
+            if (int(red) * 0.299 + int(green) * 0.587 + int(blue) * 0.114) > 186
             else self.BRIGHT
         )
     
