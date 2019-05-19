@@ -9,8 +9,19 @@ def index(request):
     <html>
         <head>
             <style>
-                ul {{list-style-type:none;}}
-                .tag {{border-radius:5px;display:inline-block;margin:3px;padding:3px 5px}}
+                body {{
+                    font-family:sans-serif;
+                    font-weight:bold;
+                }}
+                ul {{
+                    list-style-type:none;
+                }}
+                .tag {{
+                    border-radius:5px;
+                    display:inline-block;
+                    margin:3px;
+                    padding:4px 7px;
+                }}
             </style>
         </head>
         <body>
