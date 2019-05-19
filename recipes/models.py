@@ -38,23 +38,24 @@ class Recipe(models.Model):
     ]
     
     title = models.CharField(max_length=255)
-    preparationtime = models.IntegerField(blank=True)
-    cooktime = models.IntegerField(blank=True)
+    preparationtime = models.IntegerField(blank=True, null=True)
+    cooktime = models.IntegerField(blank=True, null=True)
     potion_quantity = models.FloatField()
     portion_unit = models.CharField(
         max_length=100,
         choices=PORTION_UNIT,
         default=PORTIONS
     )
-    nutrition_kcal = models.FloatField(blank=True)
-    nutrition_carbs = models.FloatField(blank=True)
-    nutrition_fat = models.FloatField(blank=True)
-    nutrition_protein = models.FloatField(blank=True)
-    note = models.TextField(blank=True)
+    nutrition_kcal = models.FloatField(blank=True, null=True)
+    nutrition_carbs = models.FloatField(blank=True, null=True)
+    nutrition_fat = models.FloatField(blank=True, null=True)
+    nutrition_protein = models.FloatField(blank=True, null=True)
+    note = models.TextField(blank=True, default='')
     author = models.CharField(max_length=100)  # new: Name of User or Crawler
     source = models.CharField(
         max_length=255,
-        blank=True
+        blank=True,
+        default=''
     )  # new: wildeisen.ch, bettybossy.ch, own... or url?
     creationdate = models.DateField()  # new
     tags = models.ManyToManyField(Tag)
@@ -65,11 +66,11 @@ class Recipe(models.Model):
 
 class Ingredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    quantity = models.FloatField(blank=True)
+    quantity = models.FloatField(blank=True, null=True)
     name = models.CharField(max_length=255)
-    group = models.CharField(max_length=100, blank=True)
+    group = models.CharField(max_length=100, blank=True, default='')
     order_item = models.IntegerField()
-    order_group = models.IntegerField(blank=True)
+    order_group = models.IntegerField(blank=True, null=True)
     
     def __str__(self):
         return f'{self.quantity} {self.name}'
@@ -88,7 +89,7 @@ class Picture(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     image = models.ImageField()
     order = models.IntegerField(default=0)
-    description = models.CharField(max_length=255, blank=True)
+    description = models.CharField(max_length=255, blank=True, default='')
     
     def __str__(self):
         return f'Picture {self.id}'
