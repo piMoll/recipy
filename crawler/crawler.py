@@ -20,6 +20,9 @@ class Handler(object):
         """
         self.input = crawler_input
 
+    def save(self):
+        raise NotImplementedError()
+
     @staticmethod
     def is_200(response):
         return response.status_code == 200
