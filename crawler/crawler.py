@@ -1,7 +1,6 @@
 import requests
 from requests.exceptions import RequestException
 from contextlib import closing
-from urllib.parse import quote
 import json
 
 
@@ -21,7 +20,8 @@ class Handler(object):
         """
         self.input = crawler_input
 
-    def is_200(self, response):
+    @staticmethod
+    def is_200(response):
         return response.status_code == 200
 
     def http_get(self, url, headers=None, params=None):
@@ -68,5 +68,3 @@ class Handler(object):
             previous_row = current_row
 
         return previous_row[-1]
-
-

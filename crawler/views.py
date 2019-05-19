@@ -31,4 +31,3 @@ def index(request):
         'success': any((imp['success'] for imp in imported_recipes.values())),
         'data': imported_recipes
     })
-

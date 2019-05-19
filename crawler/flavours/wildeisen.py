@@ -22,7 +22,7 @@ class Wildeisen(Handler):
         return 1 - (distance / input_len)
 
     def save(self):
-        r = Recipe.objects.create()
+        r = Recipe()
 
         r.title = self.find_title()
         r.preparationtime = self.find_preparationtime()
