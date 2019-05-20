@@ -1,0 +1,22 @@
+body {
+    font-family: sans-serif;
+}
+.title {
+    margin: 10px 30px;
+}
+
+.group_ingredients {
+    display: flex;
+    flex-direction: column;
+}
+.ingredient_step {
+    display: flex;
+    margin: 20px;
+}
+.step {
+    font-size: 30px;
+    margin-right: 10px;
+}
+.ingredient {
+
+}
