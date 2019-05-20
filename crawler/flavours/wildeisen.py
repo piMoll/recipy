@@ -1,5 +1,6 @@
 import re
 from bs4 import BeautifulSoup
+from bs4.element import NavigableString
 from ..crawler import http_get, get_json, levenshtein, ImportException
 from recipes.models import Recipe, Direction, Ingredient, Picture, Tag
 
@@ -64,7 +65,7 @@ class Wildeisen(object):
         if len(texts) == 0:
             return None
         if len(texts) == 1:
-            text = texts[0].string
+            text = texts[0].string.strip()
             time = self.TIME_RE.match(text).group(1)
             return int(time)
         raise ImportException('Found too many [itemprop=prepTime] tags')
@@ -74,7 +75,7 @@ class Wildeisen(object):
         if len(texts) == 0:
             return None
         if len(texts) == 1:
-            text = texts[0].string
+            text = texts[0].string.strip()
             time = self.TIME_RE.match(text).group(1)
             return int(time)
         raise ImportException('Found too many [itemprop=cookTime] tags')
@@ -87,18 +88,18 @@ class Wildeisen(object):
         if len(texts) == 0:
             return None
         if len(texts) == 1:
-            text = texts[0].string
+            text = texts[0].string.strip()
             time = self.TIME_RE.match(text).group(1)
             return int(time)
         raise ImportException('Found too many rest-time tags')
 
-    YIELD_RE = re.compile(r'.*\s+(\d+(?:-\d+))\s+(\w+)')
+    YIELD_RE = re.compile(r'.*(\d+(?:-\d+)?)\s+(\w+)')
 
     def find_portion_quantity(self):
         texts = self.dom.select('[itemprop="recipeYield"]')
         if len(texts) == 1:
-            text = texts[0].string
-            qnt = self.TIME_RE.match(text).group(1)
+            text = texts[0].string.strip()
+            qnt = self.YIELD_RE.match(text).group(1)
             return int(qnt)
         raise ImportException('Found !=1 [itemprop=recipeYield] tags')
 
@@ -108,67 +109,65 @@ class Wildeisen(object):
         if len(texts) != 1:
             raise ImportException('Found !=1 [itemprop=recipeYield] tags')
 
-        text = texts[0].string
-        unit = self.TIME_RE.match(text).group(2)
+        text = texts[0].string.strip()
+        unit = self.YIELD_RE.match(text).group(2).lower()
 
         try:
             return {
-                'Stück': Recipe.PIECES,
-                'Portionen': Recipe.PORTIONS,
-                'Portion': Recipe.PORTIONS,
+                'stück': Recipe.PIECES,
+                'portionen': Recipe.PORTIONS,
+                'portion': Recipe.PORTIONS,
+                'personen': Recipe.PORTIONS,
             }[unit]
         except KeyError as ke:
             raise ImportException(f'Don\'t know how to interpret portion unit "{unit}"', ke)
 
     def find_nutrition_kcal(self):
         texts = self.dom.select('[itemprop="calories"] > span.is--bold')
-        if len(texts) != 1:
-            raise ImportException('Found no [itemprop=calories] tag')
+        if len(texts) > 1:
+            raise ImportException('Found too many [itemprop=calories] tag')
+        if len(texts) == 0:
+            return None
         text = texts[0].string
         return int(text)
 
     def find_nutrition_carbs(self):
         texts = self.dom.select('[itemprop="carbohydrateContent"] > span.is--bold')
-        if len(texts) != 1:
-            raise ImportException('Found no [itemprop=carbohydrateContent] tag')
-        text = texts[0].string
+        if len(texts) > 1:
+            raise ImportException('Found too many [itemprop=carbohydrateContent] tag')
+        if len(texts) == 0:
+            return None
+        text = texts[0].string[:-1]  # strip 'g' (from e.g. '20g')
         return int(text)
 
     def find_nutrition_fat(self):
         texts = self.dom.select('[itemprop="fatContent"] > span.is--bold')
-        if len(texts) != 1:
-            raise ImportException('Found no [itemprop=fatContent] tag')
-        text = texts[0].string
+        if len(texts) > 1:
+            raise ImportException('Found too many [itemprop=fatContent] tag')
+        if len(texts) == 0:
+            return None
+        text = texts[0].string[:-1]  # strip 'g' (from e.g. '20g')
         return int(text)
 
     def find_nutrition_protein(self):
         texts = self.dom.select('[itemprop="proteinContent"] > span.is--bold')
-        if len(texts) != 1:
-            raise ImportException('Found no [itemprop=proteinContent] tag')
-        text = texts[0].string
+        if len(texts) > 1:
+            raise ImportException('Found too many [itemprop=proteinContent] tag')
+        if len(texts) == 0:
+            return None
+        text = texts[0].string[:-1]  # strip 'g' (from e.g. '20g')
         return int(text)
 
     def find_note(self):
-        notes = []
-
-        texts = self.dom.select('.ingredients__hint__body')
+        texts = self.dom.select('.aside__section--ingredients--hint')
         if len(texts) > 1:
-            raise ImportException('Found too many Tipps')
-        if len(texts) == 1:
-            text = texts[0].string
-            notes.append('Tipp:\n' + text)
-
-        texts = self.dom.select('.ingredients__hint')
-        if len(texts) > 1:
-            raise ImportException('Found too many Tipps')
-        if len(texts) == 1:
-            text = texts[0].string
-            notes.append('Rezepthinweis:\n' + text)
-
-        return '\n\n'.join(notes)
+            raise ImportException('Found too many notes')
+        if len(texts) == 0:
+            return ''
+        return texts[0].get_text()
 
     def find_author(self):
-        return None
+        return ''
 
     def find_source(self):
         slug = self.json['slug']
@@ -183,17 +182,25 @@ class Wildeisen(object):
             if len(group) > 1:
                 raise ImportException('Found too many group headlines')
             if len(group) == 1:
-                group = group[0].string
+                group = group[0].string.strip()
                 if group[-1] == ':':
                     group = group[:-1]
             else:
-                group = None
+                group = ''
 
             items = section.select('[itemprop="recipeIngredient"]')
             for j, item in enumerate(items):
-                quantity = item.contents[0].string
-                name = ' '.join((tag.string for tag in item.contents[1:]))
-                i = Ingredient(
+                contents = item.contents
+                while isinstance(contents[0], NavigableString):
+                    contents.pop(0)
+
+                quantity = contents.pop(0).string.strip()
+
+                rest = [tag.string or '' for tag in contents]  # get strings
+                rest = [text.strip() for text in rest if text.strip()]  # remove empty strings
+                name = ' '.join(rest)
+
+                ingredient = Ingredient(
                     quantity=quantity,
                     name=name,
                     group=group,
@@ -201,7 +208,7 @@ class Wildeisen(object):
                     order_item=j,
                     recipe_id=recipe_id
                 )
-                ingredients.append(i)
+                ingredients.append(ingredient)
 
         Ingredient.objects.bulk_create(ingredients)
 

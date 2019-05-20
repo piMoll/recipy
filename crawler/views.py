@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from .flavours import available_flavours
+import logging
 
 
 def index(request):
@@ -21,6 +22,7 @@ def index(request):
                 'result': handler(title).save()
             }
         except Exception as e:
+            logging.exception(e)
             imported_recipes[title] = {
                 'success': False,
                 'result': e.args
