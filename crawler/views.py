@@ -1,6 +1,5 @@
 from django.http import HttpResponse, JsonResponse
 from .flavours import available_flavours
-from .crawler import Handler
 
 
 def index(request):
@@ -12,7 +11,7 @@ def index(request):
     ]
     flavour = 'wildeisen'
 
-    handler = available_flavours[flavour]['handler']  # type: type(Handler)
+    handler = available_flavours[flavour]['handler']
 
     imported_recipes = {}
     for title in titles:

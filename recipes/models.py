@@ -31,7 +31,6 @@ class Tag(models.Model):
     def save(self, *args, **kwargs):
         self.font = self.calc_font()
         super(Tag, self).save(*args, **kwargs)
-            
 
 
 class Recipe(models.Model):
@@ -52,7 +51,7 @@ class Recipe(models.Model):
         max_length=100,
         choices=PORTION_UNIT,
         default=PORTIONS
-    )
+    )  # type: str
     nutrition_kcal = models.FloatField(blank=True, null=True)
     nutrition_carbs = models.FloatField(blank=True, null=True)
     nutrition_fat = models.FloatField(blank=True, null=True)
