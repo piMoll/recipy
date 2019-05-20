@@ -1,5 +1,6 @@
 from django.db import models
 import re
+from django.utils import timezone
 
 
 class Tag(models.Model):
@@ -8,9 +9,9 @@ class Tag(models.Model):
     
     name = models.CharField(max_length=100, unique=True)
     color = models.CharField(max_length=50, default=DARK)
+    font = models.CharField(max_length=50, default=BRIGHT, editable=False)
     
-    @property
-    def font(self):
+    def calc_font(self):
         """
         :see: https://stackoverflow.com/a/3943023
         :return: str
@@ -26,6 +27,11 @@ class Tag(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        self.font = self.calc_font()
+        super(Tag, self).save(*args, **kwargs)
+            
 
 
 class Recipe(models.Model):
@@ -40,7 +46,8 @@ class Recipe(models.Model):
     title = models.CharField(max_length=255)
     preparationtime = models.IntegerField(blank=True, null=True)
     cooktime = models.IntegerField(blank=True, null=True)
-    potion_quantity = models.FloatField()
+    resttime = models.IntegerField(blank=True, null=True)
+    portion_quantity = models.FloatField()
     portion_unit = models.CharField(
         max_length=100,
         choices=PORTION_UNIT,
@@ -50,23 +57,30 @@ class Recipe(models.Model):
     nutrition_carbs = models.FloatField(blank=True, null=True)
     nutrition_fat = models.FloatField(blank=True, null=True)
     nutrition_protein = models.FloatField(blank=True, null=True)
+    # meant for: Tipp, Hinweis, kleine Mengen, eigene Notizen
     note = models.TextField(blank=True, default='')
-    author = models.CharField(max_length=100)  # new: Name of User or Crawler
+    author = models.CharField(max_length=100)
     source = models.CharField(
         max_length=255,
         blank=True,
         default=''
-    )  # new: wildeisen.ch, bettybossy.ch, own... or url?
-    creationdate = models.DateField()  # new
+    )
     tags = models.ManyToManyField(Tag)
+    creationdate = models.DateField()
     
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        """ Set creation date """
+        if not self.id:
+            self.creationdate = timezone.now()
+        return super(Recipe, self).save(*args, **kwargs)
+
 
 class Ingredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    quantity = models.FloatField(blank=True, null=True)
+    quantity = models.CharField(max_length=255, blank=True, null=True)
     name = models.CharField(max_length=255)
     group = models.CharField(max_length=100, blank=True, default='')
     order_item = models.IntegerField()
