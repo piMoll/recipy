@@ -1,0 +1,26 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'recipes/style.css' %}">
+
+<h3 class="'title">{{ recipe.title }}</h3>
+{% if ingredients_list %}
+    <ul>
+    {% for ingredient in ingredients_list %}
+        <li>{{ ingredient.name }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No ingredients are available.</p>
+{% endif %}
+
+{% if directions_list %}
+    <div class="group_ingredients">
+    {% for direction in directions_list %}
+        <div class="ingredient_step">
+            <div class="step">{{ direction.step }}</div>
+            <div class="ingredient">{{ direction.description }}</div>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <p>No directions are available.</p>
+{% endif %}
