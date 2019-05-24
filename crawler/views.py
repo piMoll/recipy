@@ -1,16 +1,18 @@
+from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .flavours import available_flavours
+import json
 import logging
 
 
 def index(request):
-    # these will be passed as parameters
-    titles = [
-        'spaghetti carbonara',
-        'holunderblüten fizz',
-        'knusper truffes',
-    ]
-    flavour = 'wildeisen'
+    return HttpResponse(render(request, 'crawler/standalone.html'))
+
+
+def batch(request):
+    post = json.loads(request.body.decode('utf-8'))
+    titles = post['titles'].strip().split('\n')
+    flavour = post['flavour']
 
     handler = available_flavours[flavour]['handler']
 

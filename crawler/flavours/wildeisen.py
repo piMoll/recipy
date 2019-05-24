@@ -15,8 +15,18 @@ class Wildeisen(object):
 
         self.json = search_results['results'][0]
 
+        reliability = self.validate(self.json['name'])
+        if reliability < 0.6:  # so far, all correct matches have been >= 0.8
+            # todo: maybe import anyways and add a note
+            raise ImportException('Probably not the one we were looking for')
+
         slug = self.json['slug']
-        raw = http_get(self.RECIPE_URL + f'/{slug}')
+        recipe_url = self.RECIPE_URL + f'/{slug}'
+
+        if Recipe.objects.filter(source=recipe_url).exists():
+            raise ImportException('Already imported')
+
+        raw = http_get(recipe_url)
 
         self.dom = BeautifulSoup(raw, 'html.parser')
 
@@ -93,7 +103,7 @@ class Wildeisen(object):
             return int(time)
         raise ImportException('Found too many rest-time tags')
 
-    YIELD_RE = re.compile(r'.*(\d+(?:-\d+)?)\s+(\w+)')
+    YIELD_RE = re.compile(r'.*?(\d+(?:-\d+)?)\s+(\w+)')
 
     def find_portion_quantity(self):
         texts = self.dom.select('[itemprop="recipeYield"]')
@@ -159,12 +169,12 @@ class Wildeisen(object):
         return int(text)
 
     def find_note(self):
-        texts = self.dom.select('.aside__section--ingredients--hint')
+        texts = self.dom.select('.aside__section--ingredients-hint')
         if len(texts) > 1:
             raise ImportException('Found too many notes')
         if len(texts) == 0:
             return ''
-        return texts[0].get_text()
+        return texts[0].get_text().strip()
 
     def find_author(self):
         return ''
@@ -176,6 +186,7 @@ class Wildeisen(object):
     def add_ingredients(self, recipe_id):
         ingredients = []
 
+        j = 0
         sections = self.dom.select('.ingredients__section')
         for i, section in enumerate(sections):
             group = section.select('.headline__xsmall__bold')
@@ -189,7 +200,7 @@ class Wildeisen(object):
                 group = ''
 
             items = section.select('[itemprop="recipeIngredient"]')
-            for j, item in enumerate(items):
+            for item in items:
                 contents = item.contents
                 while isinstance(contents[0], NavigableString):
                     contents.pop(0)
@@ -205,7 +216,7 @@ class Wildeisen(object):
                     name=name,
                     group=group,
                     order_group=i,
-                    order_item=j,
+                    order_item=++j,
                     recipe_id=recipe_id
                 )
                 ingredients.append(ingredient)
