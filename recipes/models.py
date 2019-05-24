@@ -83,7 +83,6 @@ class Ingredient(models.Model):
     name = models.CharField(max_length=255)
     group = models.CharField(max_length=100, blank=True, default='')
     order_item = models.IntegerField()
-    order_group = models.IntegerField(blank=True, null=True)
     
     def __str__(self):
         return f'{self.quantity} {self.name}'
