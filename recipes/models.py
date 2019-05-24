@@ -1,6 +1,12 @@
+import os
+import random
+
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 import re
 from django.utils import timezone
+
+from recipy.settings import MEDIA_ROOT
 
 
 class Tag(models.Model):
@@ -99,10 +105,23 @@ class Direction(models.Model):
 
 
 class Picture(models.Model):
+    PICTURE_ROOT = 'recipes_img'
+
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    image = models.ImageField()
+    image = models.ImageField(upload_to=PICTURE_ROOT)
     order = models.IntegerField(default=0)
     description = models.CharField(max_length=255, blank=True, default='')
     
     def __str__(self):
         return f'Picture {self.id}'
+
+    def save(self, *args, **kwargs):
+        self.image.name = self.get_file()
+
+        super(Picture, self).save(*args, **kwargs)
+
+    def get_file(self):
+        recipe_id = '{:04d}'.format(self.recipe_id)
+        random_slug = '{:08x}'.format(random.randrange(16 ** 8))
+        extension = self.image.file.content_type.split('/')[1]
+        return f'{recipe_id}_{random_slug}.{extension}'

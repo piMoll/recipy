@@ -1,6 +1,8 @@
 import re
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 from ..crawler import http_get, get_json, levenshtein, ImportException
 from recipes.models import Recipe, Direction, Ingredient, Picture, Tag
 
@@ -54,10 +56,14 @@ class Wildeisen(object):
 
         r.save()
 
-        self.add_ingredients(r.id)
-        self.add_directions(r.id)
-        self.add_pictures(r.id)
         r.tags.add(self.find_tags())
+        try:
+            self.add_ingredients(r.id)
+            self.add_directions(r.id)
+            self.add_pictures(r.id)
+        except Exception as e:
+            r.delete()
+            raise e
 
         return {
             'input': self.input,
@@ -231,8 +237,20 @@ class Wildeisen(object):
             for i, step in enumerate(self.json['preparation_steps'])
         ])
 
+    IMG_RE = re.compile(r'.*(jpe?g|png)', re.IGNORECASE)
+
     def add_pictures(self, recipe_id):
-        pass
+        url = self.json['image_url']
+        image = http_get(url)
+
+        if not isinstance(image, SimpleUploadedFile):
+            raise ImportException(f'Failed to fetch image from {url}')
+
+        picture = Picture(recipe_id=recipe_id,
+                          image=image,
+                          order=0,
+                          description=self.json['name'])
+        picture.save()
 
     def find_tags(self):
         return Tag.objects.get(name='unvollständig')

@@ -27,7 +27,7 @@ def batch(request):
             logging.exception(e)
             imported_recipes[title] = {
                 'success': False,
-                'result': e.args
+                'result': str(e)
             }
 
     return JsonResponse({
