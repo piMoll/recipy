@@ -1,18 +1,20 @@
+from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .flavours import available_flavours
-from .crawler import Handler
+import json
+import logging
 
 
 def index(request):
-    # these will be passed as parameters
-    titles = [
-        'spaghetti carbonara',
-        'holunderblüten fizz',
-        'knusper truffes',
-    ]
-    flavour = 'wildeisen'
+    return HttpResponse(render(request, 'crawler/standalone.html'))
 
-    handler = available_flavours[flavour]['handler']  # type: type(Handler)
+
+def batch(request):
+    post = json.loads(request.body.decode('utf-8'))
+    titles = post['titles'].strip().split('\n')
+    flavour = post['flavour']
+
+    handler = available_flavours[flavour]['handler']
 
     imported_recipes = {}
     for title in titles:
@@ -22,6 +24,7 @@ def index(request):
                 'result': handler(title).save()
             }
         except Exception as e:
+            logging.exception(e)
             imported_recipes[title] = {
                 'success': False,
                 'result': e.args

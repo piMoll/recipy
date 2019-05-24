@@ -1,0 +1,10 @@
+{% load static %}
+<div id="recipy-crawler">
+    <textarea id="recipy-crawler-text" cols="80" rows="10"></textarea>
+    <input id="recipy-crawler-flavour" type="hidden" value="wildeisen">
+    <button id="recipy-crawler-submit">Import</button>
+    <div>
+        <pre><code id="recipy-crawler-response"></code></pre>
+    </div>
+    <script type="text/javascript" src="{% static 'crawler/crawler.js' %}"></script>
+</div>

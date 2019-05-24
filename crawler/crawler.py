@@ -13,37 +13,28 @@ class ImportException(Exception):
         self.cause = cause
 
 
-class Handler(object):
-    def __init__(self, crawler_input):
-        """
-        :param crawler_input: str 
-        """
-        self.input = crawler_input
+def is_200(response):
+    return response.status_code == 200
 
-    def save(self):
-        raise NotImplementedError()
 
-    @staticmethod
-    def is_200(response):
-        return response.status_code == 200
+def http_get(url, headers=None, params=None):
+    try:
+        with closing(requests.get(url, params=params, stream=True, headers=headers)) as resp:
+            if not is_200(resp):
+                raise ImportException(f'Could not fetch url: {url}')
+            return resp.content.decode('utf-8')
+    except RequestException as e:
+        raise ImportException(f'Could not fetch url: {url}', e)
 
-    def http_get(self, url, headers=None, params=None):
-        try:
-            with closing(requests.get(url, params=params, stream=True, headers=headers)) as resp:
-                if not self.is_200(resp):
-                    raise ImportException(f'Could not fetch url for input "{self.input}": {url}')
-                return resp.content.decode('utf-8')
-        except RequestException as e:
-            raise ImportException(f'Could not fetch url for input "{self.input}": {url}', e)
 
-    def get_json(self, url, **kwargs):
-        headers = kwargs.pop('headers', {})
-        headers['Accept'] = 'application/json'
-        raw_json = self.http_get(url, headers=headers, **kwargs)
-        return json.loads(raw_json)
+def get_json(url, **kwargs):
+    headers = kwargs.pop('headers', {})
+    headers['Accept'] = 'application/json'
+    raw_json = http_get(url, headers=headers, **kwargs)
+    return json.loads(raw_json)
 
-    @classmethod
-    def levenshtein(cls, s1, s2):
+
+def levenshtein(s1, s2):
         """
         From https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
         License: https://creativecommons.org/licenses/by-sa/3.0/
@@ -52,7 +43,7 @@ class Handler(object):
         :return:
         """
         if len(s1) < len(s2):
-            return cls.levenshtein(s2, s1)
+            return levenshtein(s2, s1)
 
         # len(s1) >= len(s2)
         if len(s2) == 0:
