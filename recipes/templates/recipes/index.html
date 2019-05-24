@@ -1,26 +1,54 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'recipes/style.css' %}">
 
-<h3 class="'title">{{ recipe.title }}</h3>
-{% if ingredients_list %}
-    <ul>
-    {% for ingredient in ingredients_list %}
-        <li>{{ ingredient.name }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No ingredients are available.</p>
-{% endif %}
+<header></header>
 
-{% if directions_list %}
-    <div class="group_ingredients">
-    {% for direction in directions_list %}
-        <div class="ingredient_step">
-            <div class="step">{{ direction.step }}</div>
-            <div class="ingredient">{{ direction.description }}</div>
-        </div>
-    {% endfor %}
+<div class="recipe">
+
+    <div class="recipe-header">
+
+        <h1 class="title">{{ recipe.title }}</h1>
+
+        <section class="">
+            <div class="image"></div>
+            <aside class="time"></aside>
+        </section>
     </div>
-{% else %}
-    <p>No directions are available.</p>
-{% endif %}
+
+
+
+
+    <div class="recipe-details">
+        <section class="ingredients">
+            <h3 class="section-title">Zutaten</h3>
+            {% if ingredients_list %}
+                <div class="ingredient-group">
+                    <ul class="ingredient-list">
+                    {% for ingredient in ingredients_list %}
+                        <li class="ingredient-item">
+                            <span class="ingredient-quantity"> {{ ingredient.quantity }} </span>
+                            <span class="ingredient-name"> {{ ingredient.name }} </span>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <p>No ingredients are available.</p>
+            {% endif %}
+        </section>
+
+        <section class="directions">
+            <h3 class="section-title">Zubereitung</h3>
+            {% if directions_list %}
+                {% for direction in directions_list %}
+                    <div class="direction-row">
+                        <div class="direction-step">{{ direction.step }}</div>
+                        <div class="direction-text">{{ direction.description }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No directions are available.</p>
+            {% endif %}
+        </section>
+    </div>
+</div>
