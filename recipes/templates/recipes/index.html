@@ -1,26 +1,91 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'recipes/style.css' %}">
 
-<h3 class="'title">{{ recipe.title }}</h3>
-{% if ingredients_list %}
-    <ul>
-    {% for ingredient in ingredients_list %}
-        <li>{{ ingredient.name }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No ingredients are available.</p>
-{% endif %}
+<header></header>
 
-{% if directions_list %}
-    <div class="group_ingredients">
-    {% for direction in directions_list %}
-        <div class="ingredient_step">
-            <div class="step">{{ direction.step }}</div>
-            <div class="ingredient">{{ direction.description }}</div>
-        </div>
-    {% endfor %}
+<div class="recipe">
+
+    <div class="recipe-header">
+
+        <section class="">
+            <div class="image">
+                {% if picture %}
+                    <img src="{{ picture.image.url }}" alt="{{ recipe.title }}">
+                {% endif %}
+            </div>
+            <h1 class="title">{{ recipe.title }}</h1>
+            <aside class="description">
+                <div class="tags">
+                    {% for tag in tags %}
+                        <div class="tag" style="color:{{ tag.font }};background-color:{{ tag.color }}">{{ tag.name }}</div>
+                    {% endfor %}
+                </div>
+                <div class="recipe-times">
+                {% if recipe.preparationtime %}
+                    <div class="duration-type">
+                        <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.preparationtime }} min</div>
+                    </div>
+                {% endif %}
+                {% if recipe.cooktime %}
+                    <div class="duration-type">
+                        <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.cooktime }} min</div>
+                    </div>
+                {% endif %}
+                {% if recipe.resttime %}
+                    <div class="duration-type">
+                        <div class="duration-title">Ruhezeit:</div><div>{{ recipe.resttime }} min</div>
+                    </div>
+                {% endif %}
+                </div>
+            </aside>
+        </section>
     </div>
-{% else %}
-    <p>No directions are available.</p>
-{% endif %}
+
+
+
+
+    <div class="recipe-details">
+        <section class="ingredients">
+            <h3 class="section-title">Zutaten</h3>
+                <div class="ingredient-details">
+                {% regroup ingredients by group as ingredient_list%}
+                    {% for group in ingredient_list %}
+                        <div>
+                            <div class="ingredients-group">{{ group.grouper }}</div>
+                        <ul class="ingredient-list">
+                            {% for ingredient in group.list %}
+                                <li class="ingredient-item">
+                                    <span class="ingredient-quantity"> {{ ingredient.quantity }} </span>
+                                    <span class="ingredient-name"> {{ ingredient.name }} </span>
+                                </li>
+                            {% empty %}
+                                <li class="ingredient-item"> Keine Zutaten gefunden</li>
+                            {% endfor %}
+                        </ul>
+                        </div>
+                    {% endfor %}
+                </div>
+        </section>
+
+
+        <section class="directions">
+            <h3 class="section-title">Zubereitung</h3>
+                {% for direction in directions %}
+                    <div class="direction-row">
+                        <div class="direction-step">{{ direction.step }}</div>
+                        <div class="direction-text">{{ direction.description }}</div>
+                    </div>
+                    {% empty %}
+                        <li class="ingredient-item"> Keine Zutaten gefunden</li>
+                {% endfor %}
+
+
+            {% if recipe.note %}
+                <div class="recipe-notes">
+                {{ recipe.note }}
+                </div>
+            {% endif %}
+
+        </section>
+    </div>
+</div>

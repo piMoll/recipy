@@ -136,7 +136,7 @@ def createTestData():
     pic = Picture.objects.filter(recipe=recipe)
     if not pic:
         Picture.objects.create(
-            image='stubs/important_test_image.jpg',
+            image='recipes_img/important_test_image.jpg',
             order=1,
             recipe=recipe,
             description='Schönes Bild'
