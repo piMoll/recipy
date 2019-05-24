@@ -221,7 +221,6 @@ class Wildeisen(object):
                     quantity=quantity,
                     name=name,
                     group=group,
-                    order_group=i,
                     order_item=++j,
                     recipe_id=recipe_id
                 )
