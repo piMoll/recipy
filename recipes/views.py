@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.template import loader
-from .models import Tag, Recipe, Ingredient, Direction
+from .models import Tag, Recipe, Ingredient, Direction, Picture
 
 
 def index(request):
@@ -38,10 +38,12 @@ def index(request):
 
 def detail(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
+    picture = Picture.objects.filter(recipe=recipe_id)[0]
     ingredients_list = Ingredient.objects.filter(recipe=recipe_id).order_by('order_item')
     directions_list = Direction.objects.filter(recipe=recipe_id).order_by('step')
     context = {
         'recipe': recipe,
+        'picture': picture,
         'ingredients_list': ingredients_list,
         'directions_list': directions_list
     }
