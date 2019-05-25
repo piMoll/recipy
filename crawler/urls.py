@@ -2,6 +2,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('batch', views.batch, name='batch')
+    path('', views.ImportView.as_view(), name='index'),
 ]

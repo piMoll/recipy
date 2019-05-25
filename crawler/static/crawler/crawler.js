@@ -27,7 +27,13 @@
             titles,
             flavour,
         };
-        let resp = await post('batch', postData);
+
+        let resp;
+        try {
+            resp = await post('batch', postData);
+        } catch (e) {
+            resp = {error: e.message}
+        }
         resparea.textContent = JSON.stringify(resp, null, 4);
     }, false)
 })();

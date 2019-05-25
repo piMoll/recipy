@@ -11,16 +11,26 @@ class Wildeisen(object):
     SEARCH_URL = 'https://www.wildeisen.ch/suche/rezepte'
     RECIPE_URL = 'https://www.wildeisen.ch/rezepte'
 
+    @staticmethod
+    def http_get(*args, **kwargs):
+        return http_get(*args, **kwargs)
+
+    @staticmethod
+    def get_json(*args, **kwargs):
+        return get_json(*args, **kwargs)
+
     def __init__(self, crawler_input):
         self.input = crawler_input
-        search_results = get_json(self.SEARCH_URL, params={'q': self.input})
+        search_results = self.get_json(self.SEARCH_URL, params={'q': self.input})
 
+        if len(search_results['results']) == 0:
+            raise ImportException(f'No recipes found for title "{self.input}"')
         self.json = search_results['results'][0]
 
         reliability = self.validate(self.json['name'])
         if reliability < 0.6:  # so far, all correct matches have been >= 0.8
             # todo: maybe import anyways and add a note
-            raise ImportException('Probably not the one we were looking for')
+            raise ImportException(f'Probably not the one we were looking for, found: {self.json["name"]}')
 
         slug = self.json['slug']
         recipe_url = self.RECIPE_URL + f'/{slug}'
@@ -28,7 +38,7 @@ class Wildeisen(object):
         if Recipe.objects.filter(source=recipe_url).exists():
             raise ImportException('Already imported')
 
-        raw = http_get(recipe_url)
+        raw = self.http_get(recipe_url)
 
         self.dom = BeautifulSoup(raw, 'html.parser')
 
@@ -128,6 +138,15 @@ class Wildeisen(object):
         text = texts[0].string.strip()
         unit = self.YIELD_RE.match(text).group(2).lower()
 
+        # TODO: this is a temporal fix, we should catch the KeyError and issue a warning
+        return {
+            'stück': Recipe.PIECES,
+            'portionen': Recipe.PORTIONS,
+            'portion': Recipe.PORTIONS,
+            'personen': Recipe.PORTIONS,
+        }.get(unit, Recipe.PIECES)
+
+        # noinspection PyUnreachableCode
         try:
             return {
                 'stück': Recipe.PIECES,
@@ -240,7 +259,7 @@ class Wildeisen(object):
 
     def add_pictures(self, recipe_id):
         url = self.json['image_url']
-        image = http_get(url)
+        image = self.http_get(url)
 
         if not isinstance(image, SimpleUploadedFile):
             raise ImportException(f'Failed to fetch image from {url}')

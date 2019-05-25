@@ -1,8 +1,6 @@
 import os
 from urllib.parse import urlparse
-
 import requests
-from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 from requests.exceptions import RequestException
 from contextlib import closing
@@ -18,11 +16,10 @@ class ImportException(Exception):
         self.cause = cause
 
 
-def is_200(response):
-    return response.status_code == 200
-
-
 def get_filename(resp):
+    """
+    Works with requests.Response.
+    """
     content_disposition = resp.headers.get('content-disposition', None)
     if content_disposition:
         for disposition in content_disposition.split(';'):
@@ -47,7 +44,7 @@ def decode_content_if_text(resp):
 def http_get(url, headers=None, params=None):
     try:
         with closing(requests.get(url, params=params, stream=True, headers=headers)) as resp:
-            if not is_200(resp):
+            if not resp.status_code == 200:
                 raise ImportException(f'Could not fetch url: {url}')
             return decode_content_if_text(resp)
     except RequestException as e:
@@ -89,11 +86,3 @@ def levenshtein(s1, s2):
         previous_row = current_row
 
     return previous_row[-1]
-
-
-def bytes_to_file(bytes, file):
-    with open(file, 'wb+') as dest:
-        chunk_size = 4096
-        for i in range(0, len(bytes), chunk_size):
-            dest.write(bytes[i:i + chunk_size])
-    return File(file)

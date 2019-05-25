@@ -1,10 +1,13 @@
-{% load static %}
-<div id="recipy-crawler">
-    <textarea id="recipy-crawler-text" cols="80" rows="10"></textarea>
-    <input id="recipy-crawler-flavour" type="hidden" value="wildeisen">
-    <button id="recipy-crawler-submit">Import</button>
-    <div>
-        <pre><code id="recipy-crawler-response"></code></pre>
-    </div>
-    <script type="text/javascript" src="{% static 'crawler/crawler.js' %}"></script>
+<form method="post" class="crawler-form">
+    {{ form.as_p }}
+    <input type="submit" value="Import">
+</form>
+{% if processed_imports %}
+<div class="crawler-response">
+    <pre>
+        <code>
+{{ processed_imports }}
+        </code>
+    </pre>
 </div>
+{% endif %}
