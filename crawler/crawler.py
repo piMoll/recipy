@@ -53,7 +53,7 @@ class BatchCrawler(object):
 
         self.jobs = list(jobs)
         self.running = []
-        asyncio.run(self._crawl_all(), debug=DEBUG)
+        asyncio.run(self._crawl_all())
 
         return self.get_result()
 
