@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 from .models import Tag, Recipe, Ingredient, Direction, Picture
 from django.views.generic.detail import DetailView
+from django.db.models import Q
 
 
 def index(request):
@@ -40,3 +41,19 @@ def index(request):
 class RecipeDetailsView(DetailView):
     model = Recipe
 
+
+def search(request):
+    if request.method == 'GET':
+        query = request.GET.get('searchstring')
+        submitbutton = request.GET.get('submit')
+
+        if query is not None:
+            lookups = Q(title__icontains=query)
+            results = Recipe.objects.filter(lookups).distinct()
+            context = {'results': results,
+                       'submitbutton': submitbutton}
+            return render(request, 'recipes/search.html', context)
+        else:
+            return render(request, 'recipes/search.html')
+    else:
+        return render(request, 'recipes/search.html')

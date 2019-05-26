@@ -6,4 +6,5 @@ app_name = 'recipes'
 urlpatterns = [
     path('', views.index, name='index'),
     path('<int:pk>', RecipeDetailsView.as_view(), name='detail'),
+    path('search/', views.search, name='search'),
 ]
