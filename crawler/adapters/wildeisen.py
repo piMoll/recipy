@@ -3,25 +3,46 @@ from bs4 import BeautifulSoup
 from bs4.element import NavigableString
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from ..crawler import http_get, get_json, levenshtein, ImportException
+from ..crawler import levenshtein, ImportException, BatchCrawler
 from recipes.models import Recipe, Direction, Ingredient, Picture, Tag
 
 
-class Wildeisen(object):
+class Wildeisen(BatchCrawler):
+    PARALLEL_JOBS = 10
+
     SEARCH_URL = 'https://www.wildeisen.ch/suche/rezepte'
     RECIPE_URL = 'https://www.wildeisen.ch/rezepte'
 
-    @staticmethod
-    def http_get(*args, **kwargs):
-        return http_get(*args, **kwargs)
+    def __init__(self):
+        super(Wildeisen, self).__init__()
+        self.input = None
+        self.dom = None
+        self.json = None
+        self.results = {}
 
-    @staticmethod
-    def get_json(*args, **kwargs):
-        return get_json(*args, **kwargs)
+    def get_result(self):
+        return self.results
 
-    def __init__(self, crawler_input):
-        self.input = crawler_input
-        search_results = self.get_json(self.SEARCH_URL, params={'q': self.input})
+    async def crawl_single(self, job):
+        self.input = job
+
+        try:
+            result = await self.save()
+        except ImportException as e:
+            result = {
+                'success': False,
+                'result': str(e)
+            }
+
+        self.results[self.input] = result
+
+    def validate(self, name):
+        input_len = len(self.input)
+        distance = levenshtein(self.input, name[0:input_len])
+        return 1 - (distance / input_len)
+
+    async def save(self):
+        search_results = await self.get_json(self.SEARCH_URL, params={'q': self.input})
 
         if len(search_results['results']) == 0:
             raise ImportException(f'No recipes found for title "{self.input}"')
@@ -38,16 +59,10 @@ class Wildeisen(object):
         if Recipe.objects.filter(source=recipe_url).exists():
             raise ImportException('Already imported')
 
-        raw = self.http_get(recipe_url)
+        raw = await self.http_get(recipe_url)
 
         self.dom = BeautifulSoup(raw, 'html.parser')
 
-    def validate(self, name):
-        input_len = len(self.input)
-        distance = levenshtein(self.input, name[0:input_len])
-        return 1 - (distance / input_len)
-
-    def save(self):
         r = Recipe()
 
         r.title = self.find_title()
@@ -70,7 +85,7 @@ class Wildeisen(object):
         try:
             self.add_ingredients(r.id)
             self.add_directions(r.id)
-            self.add_pictures(r.id)
+            await self.add_pictures(r.id)
         except Exception as e:
             r.delete()
             raise e
@@ -257,9 +272,9 @@ class Wildeisen(object):
 
     IMG_RE = re.compile(r'.*(jpe?g|png)', re.IGNORECASE)
 
-    def add_pictures(self, recipe_id):
+    async def add_pictures(self, recipe_id):
         url = self.json['image_url']
-        image = self.http_get(url)
+        image = await self.http_get(url)
 
         if not isinstance(image, SimpleUploadedFile):
             raise ImportException(f'Failed to fetch image from {url}')

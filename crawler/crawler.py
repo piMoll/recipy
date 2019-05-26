@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from requests.exceptions import RequestException
 from contextlib import closing
 import json
+from recipy.settings import DEBUG
 
 
 class ImportException(Exception):
@@ -16,10 +17,76 @@ class ImportException(Exception):
         self.cause = cause
 
 
+class BatchCrawler(object):
+    PARALLEL_JOBS = 5
+
+    def __init__(self):
+        self.client = None
+        self.jobs = None
+        self.running = None
+
+    async def crawl_single(self, job):
+        raise NotImplementedError()
+
+    def get_result(self):
+        raise NotImplementedError()
+
+    async def _crawl_all(self):
+        import asyncio
+        import aiohttp
+
+        self.client = aiohttp.ClientSession()
+
+        while len(self.jobs) > 0:
+            if len(self.running) >= self.PARALLEL_JOBS:
+                await self.running.pop(0)
+            self.running.append(self.crawl_single(self.jobs.pop(0)))
+            print(f'running jobs: {len(self.running)}')
+
+        print(f'running jobs: {len(self.running)}')
+        # finalize
+        await asyncio.gather(*self.running)
+        await self.client.close()
+
+    def crawl_all(self, jobs):
+        import asyncio
+
+        self.jobs = list(jobs)
+        self.running = []
+        asyncio.run(self._crawl_all(), debug=DEBUG)
+
+        return self.get_result()
+
+    async def http_get(self, url, headers=None, params=None):
+        import aiohttp.http_exceptions
+
+        try:
+            resp = await self.client.get(url, headers=headers, params=params)
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ) as e:
+            raise ImportException(f'Could not fetch url: {url}, reason: {str(e)}', e)
+        if not resp.status == 200:
+            raise ImportException(f'Could not fetch url: {url}', resp.status)
+        return await self.decode_content(resp)
+
+    async def get_json(self, url, **kwargs):
+        headers = kwargs.pop('headers', {})
+        headers['Accept'] = 'application/json'
+        raw_json = await self.http_get(url, headers=headers, **kwargs)
+        return json.loads(raw_json)
+
+    async def decode_content(self, resp):
+        content_type = resp.headers['content-type']  # type: str
+        if any((text_type in content_type for text_type in ['application/json', 'text/html', 'charset=utf-8'])):
+            return await resp.text()
+        if content_type.startswith('image/'):
+            return SimpleUploadedFile(get_filename(resp), await resp.read(), content_type)
+        return await resp.read()
+
+
 def get_filename(resp):
-    """
-    Works with requests.Response.
-    """
     content_disposition = resp.headers.get('content-disposition', None)
     if content_disposition:
         for disposition in content_disposition.split(';'):
@@ -27,9 +94,7 @@ def get_filename(resp):
             key = 'filename'
             if disposition[0:len(key) + 1] == f'{key}=':
                 return disposition[len(key) + 1:].strip()
-    url = urlparse(resp.url)
-    path = url.path
-    return os.path.basename(path)
+    return resp.url.name
 
 
 def decode_content_if_text(resp):

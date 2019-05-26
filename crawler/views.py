@@ -1,11 +1,8 @@
 from django import forms
-from django.shortcuts import render
-from django.http import HttpResponse
 from django.views.generic import FormView
 
 from .adapters import available_options
 import json
-import logging
 
 
 class ImportForm(forms.Form):
@@ -28,19 +25,21 @@ class ImportView(FormView):
         handler = form.cleaned_data['adapter']
         titles = form.cleaned_data['titles'].split('\r\n')
 
-        imported_recipes = {}
-        for title in titles:
-            try:
-                imported_recipes[title] = {
-                    'success': True,
-                    'result': handler(title).save()
-                }
-            except Exception as e:
-                logging.exception(e)
-                imported_recipes[title] = {
-                    'success': False,
-                    'result': str(e)
-                }
+        # imported_recipes = {}
+        # for title in titles:
+        #     try:
+        #         imported_recipes[title] = {
+        #             'success': True,
+        #             'result': handler(title).save()
+        #         }
+        #     except Exception as e:
+        #         logging.exception(e)
+        #         imported_recipes[title] = {
+        #             'success': False,
+        #             'result': str(e)
+        #         }
+
+        imported_recipes = handler(titles)
 
         import_result = {
             'success': any((imp['success'] for imp in imported_recipes.values())),
