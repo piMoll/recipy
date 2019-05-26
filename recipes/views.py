@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.template import loader
 from .models import Tag, Recipe, Ingredient, Direction, Picture
+from django.views.generic.detail import DetailView
 
 
 def index(request):
@@ -36,17 +37,6 @@ def index(request):
     return HttpResponse(html)
 
 
-def detail(request, recipe_id):
-    recipe = get_object_or_404(Recipe, pk=recipe_id)
-    picture = Picture.objects.filter(recipe=recipe_id)[0]
-    tags = Tag.objects.filter(recipe=recipe_id)
-    ingredients = Ingredient.objects.filter(recipe=recipe_id).order_by('order_item')
-    directions = Direction.objects.filter(recipe=recipe_id).order_by('step')
-    context = {
-        'recipe': recipe,
-        'picture': picture,
-        'tags': tags,
-        'ingredients': ingredients,
-        'directions': directions
-    }
-    return render(request, 'recipes/index.html', context)
+class RecipeDetailsView(DetailView):
+    model = Recipe
+

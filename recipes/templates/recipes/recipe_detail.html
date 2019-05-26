@@ -1,39 +1,47 @@
+{% extends "base.html" %}
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'recipes/style.css' %}">
 
-<header></header>
+{% block title %}Rezept {{ object.title }}{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'recipes/style.css' %}">
+{% endblock %}
+
+{% block content %}
+
 
 <div class="recipe">
 
-    <div class="recipe-header">
+    <div class="recipe-header gutter">
 
         <section class="">
             <div class="image">
-                {% if picture %}
-                    <img src="{{ picture.image.url }}" alt="{{ recipe.title }}">
+                {% if object.picture_set.get %}
+                    <img src="{{ object.picture_set.get.image.url }}" alt="{{ object.title }}">
                 {% endif %}
             </div>
-            <h1 class="title">{{ recipe.title }}</h1>
-            <aside class="description">
+            <h1 class="title gutter">{{ object.title }}</h1>
+            <aside class="description gutter">
                 <div class="tags">
-                    {% for tag in tags %}
+                    {% for tag in object.tags.all %}
                         <div class="tag" style="color:{{ tag.font }};background-color:{{ tag.color }}">{{ tag.name }}</div>
                     {% endfor %}
                 </div>
                 <div class="recipe-times">
-                {% if recipe.preparationtime %}
+                {% if object.preparationtime %}
                     <div class="duration-type">
-                        <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.preparationtime }} min</div>
+                        <div class="duration-title">Vorbereitungszeit:</div><div>{{ object.preparationtime }} min</div>
                     </div>
                 {% endif %}
-                {% if recipe.cooktime %}
+                {% if object.cooktime %}
                     <div class="duration-type">
-                        <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.cooktime }} min</div>
+                        <div class="duration-title">Koch-/Backzeit:</div><div>{{ object.cooktime }} min</div>
                     </div>
                 {% endif %}
-                {% if recipe.resttime %}
+                {% if object.resttime %}
                     <div class="duration-type">
-                        <div class="duration-title">Ruhezeit:</div><div>{{ recipe.resttime }} min</div>
+                        <div class="duration-title">Ruhezeit:</div><div>{{ object.resttime }} Stunden</div>
                     </div>
                 {% endif %}
                 </div>
@@ -44,14 +52,14 @@
 
 
 
-    <div class="recipe-details">
+    <div class="recipe-details gutter">
         <section class="ingredients">
             <h3 class="section-title">Zutaten</h3>
                 <div class="ingredient-details">
-                {% regroup ingredients by group as ingredient_list%}
-                    {% for group in ingredient_list %}
+                {% regroup object.ingredient_set.all by group as ingredient_set %}
+                    {% for group in ingredient_set %}
                         <div>
-                            <div class="ingredients-group">{{ group.grouper }}</div>
+                            <div class="ingredients-group">{{ group.grouper|upper }}</div>
                         <ul class="ingredient-list">
                             {% for ingredient in group.list %}
                                 <li class="ingredient-item">
@@ -70,7 +78,7 @@
 
         <section class="directions">
             <h3 class="section-title">Zubereitung</h3>
-                {% for direction in directions %}
+                {% for direction in object.direction_set.all %}
                     <div class="direction-row">
                         <div class="direction-step">{{ direction.step }}</div>
                         <div class="direction-text">{{ direction.description }}</div>
@@ -80,12 +88,14 @@
                 {% endfor %}
 
 
-            {% if recipe.note %}
+            {% if object.note %}
                 <div class="recipe-notes">
-                {{ recipe.note }}
+                {{ object.note }}
                 </div>
             {% endif %}
 
         </section>
     </div>
 </div>
+
+{% endblock %}
