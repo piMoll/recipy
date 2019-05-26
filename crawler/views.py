@@ -41,9 +41,13 @@ class ImportView(FormView):
 
         imported_recipes = handler(titles)
 
+        success = any((
+            job['success'] for job in imported_recipes.values()
+        ))
+
         import_result = {
-            'success': any((imp['success'] for imp in imported_recipes.values())),
-            'data': imported_recipes
+            'success': success,
+            'data': imported_recipes,
         }
         import_result = json.dumps(import_result, indent=4, ensure_ascii=False)
 

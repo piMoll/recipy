@@ -32,7 +32,6 @@ class BatchCrawler(object):
         raise NotImplementedError()
 
     async def _crawl_all(self):
-        import asyncio
         import aiohttp
 
         self.client = aiohttp.ClientSession()
@@ -43,9 +42,10 @@ class BatchCrawler(object):
             self.running.append(self.crawl_single(self.jobs.pop(0)))
             print(f'running jobs: {len(self.running)}')
 
-        print(f'running jobs: {len(self.running)}')
         # finalize
-        await asyncio.gather(*self.running)
+        for task in self.running:
+            await task
+
         await self.client.close()
 
     def crawl_all(self, jobs):
