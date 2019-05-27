@@ -45,9 +45,7 @@ class BatchCrawler(object):
 
             # if the queue is full, wait for a task to complete:
             if len(self.running) >= self.PARALLEL_JOBS:
-                done, pending = await asyncio.wait(self.running, return_when=asyncio.FIRST_COMPLETED)
-                for future in done:
-                    await future
+                _, pending = await asyncio.wait(self.running, return_when=asyncio.FIRST_COMPLETED)
                 self.running = list(pending)  # hold on to the rest
 
         # finalize
