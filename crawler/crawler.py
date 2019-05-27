@@ -1,11 +1,8 @@
-import os
-from urllib.parse import urlparse
 import requests
 from django.core.files.uploadedfile import SimpleUploadedFile
 from requests.exceptions import RequestException
 from contextlib import closing
 import json
-from recipy.settings import DEBUG
 
 
 class ImportException(Exception):
@@ -19,11 +16,14 @@ class ImportException(Exception):
 
 class BatchCrawler(object):
     PARALLEL_JOBS = 5
+    client = None
 
     def __init__(self):
-        self.client = None
-        self.jobs = None
-        self.running = None
+        self.jobs = []
+        self.running = []
+
+    def _crawl_single(self, job):
+        return type(self)().crawl_single(job)
 
     async def crawl_single(self, job):
         raise NotImplementedError()
@@ -33,26 +33,33 @@ class BatchCrawler(object):
 
     async def _crawl_all(self):
         import aiohttp
+        import asyncio
 
-        self.client = aiohttp.ClientSession()
+        BatchCrawler.client = aiohttp.ClientSession()
 
         while len(self.jobs) > 0:
-            if len(self.running) >= self.PARALLEL_JOBS:
-                await self.running.pop(0)
-            self.running.append(self.crawl_single(self.jobs.pop(0)))
+            # create and launch a new task
+            next_job = self.jobs.pop(0)
+            next_task = asyncio.create_task(self._crawl_single(next_job))
+            self.running.append(next_task)
             print(f'running jobs: {len(self.running)}')
 
-        # finalize
-        for task in self.running:
-            await task
+            # if the queue is full, wait for a task to complete:
+            if len(self.running) >= self.PARALLEL_JOBS:
+                done, pending = await asyncio.wait(self.running, return_when=asyncio.FIRST_COMPLETED)
+                for future in done:
+                    await future
+                self.running = list(pending)  # hold on to the rest
 
+        # finalize
+        await asyncio.gather(*self.running)
         await self.client.close()
 
     def crawl_all(self, jobs):
         import asyncio
 
         self.jobs = list(jobs)
-        self.running = []
+        self.running.clear()
         asyncio.run(self._crawl_all())
 
         return self.get_result()
@@ -84,6 +91,12 @@ class BatchCrawler(object):
         if content_type.startswith('image/'):
             return SimpleUploadedFile(get_filename(resp), await resp.read(), content_type)
         return await resp.read()
+
+    def prepend_job(self, job):
+        self.jobs.insert(0, job)
+
+    def append_job(self, job):
+        self.jobs.append(job)
 
 
 def get_filename(resp):

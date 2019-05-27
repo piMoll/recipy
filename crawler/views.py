@@ -41,9 +41,9 @@ class ImportView(FormView):
 
         imported_recipes = handler(titles)
 
-        success = any((
+        success = any(
             job['success'] for job in imported_recipes.values()
-        ))
+        )
 
         import_result = {
             'success': success,
