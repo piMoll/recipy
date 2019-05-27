@@ -42,7 +42,6 @@ class BatchCrawler(object):
             next_job = self.jobs.pop(0)
             next_task = asyncio.create_task(self._crawl_single(next_job))
             self.running.append(next_task)
-            print(f'running jobs: {len(self.running)}')
 
             # if the queue is full, wait for a task to complete:
             if len(self.running) >= self.PARALLEL_JOBS:
