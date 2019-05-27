@@ -12,13 +12,13 @@ class Wildeisen(BatchCrawler):
 
     SEARCH_URL = 'https://www.wildeisen.ch/suche/rezepte'
     RECIPE_URL = 'https://www.wildeisen.ch/rezepte'
+    results = {}
 
     def __init__(self):
         super(Wildeisen, self).__init__()
         self.input = None
         self.dom = None
         self.json = None
-        self.results = {}
 
     def get_result(self):
         return self.results
@@ -143,8 +143,8 @@ class Wildeisen(BatchCrawler):
         texts = self.dom.select('[itemprop="recipeYield"]')
         if len(texts) == 1:
             text = texts[0].string.strip()
-            qnt = self.YIELD_RE.match(text).group(1)
-            return int(qnt)
+            qnt = self.YIELD_RE.match(text).group(1).split('-')
+            return sum(int(q) for q in qnt) / len(qnt)
         raise ImportException('Found !=1 [itemprop=recipeYield] tags')
 
     def find_portion_unit(self):
