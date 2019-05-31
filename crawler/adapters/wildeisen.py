@@ -59,8 +59,11 @@ class Wildeisen(BatchCrawler):
         slug = self.json['slug']
         recipe_url = self.RECIPE_URL + f'/{slug}'
 
-        if Recipe.objects.filter(source=recipe_url).exists():
-            raise ImportException('Already imported')
+        q = Recipe.objects.filter(source=recipe_url)
+        if q.exists():
+            r = q.first()
+            url = r.get_absolute_url()
+            raise ImportException(f'Already imported: {url}')
 
         raw = await self.http_get(recipe_url)
 
@@ -97,6 +100,7 @@ class Wildeisen(BatchCrawler):
             'input': self.input,
             'found_recipe': r.title,
             'reliability': self.validate(r.title),
+            'url': r.get_absolute_url()
         }
 
     def find_title(self):

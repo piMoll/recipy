@@ -14,7 +14,7 @@ class ImportForm(forms.Form):
 
 
 class ImportView(FormView):
-    template_name = 'crawler/standalone.html'
+    template_name = 'crawler/index.html'
     form_class = ImportForm
     success_url = '.'
 
@@ -24,20 +24,6 @@ class ImportView(FormView):
         """
         handler = form.cleaned_data['adapter']
         titles = form.cleaned_data['titles'].split('\r\n')
-
-        # imported_recipes = {}
-        # for title in titles:
-        #     try:
-        #         imported_recipes[title] = {
-        #             'success': True,
-        #             'result': handler(title).save()
-        #         }
-        #     except Exception as e:
-        #         logging.exception(e)
-        #         imported_recipes[title] = {
-        #             'success': False,
-        #             'result': str(e)
-        #         }
 
         imported_recipes = handler(titles)
 

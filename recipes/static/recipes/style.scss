@@ -8,8 +8,10 @@ body {
 
 .recipe {}
 
+$page-gutter-width: 900px;
+
 .gutter {
-    max-width: 900px;
+    max-width: $page-gutter-width;
     margin: auto;
     display: block;
 }
@@ -52,6 +54,7 @@ body {
     margin-right: 8px;
     padding: 3px 6px;
     font-weight: bold;
+    text-decoration: none;
 }
 
 .recipe-times {
@@ -127,3 +130,101 @@ body {
     font-style: italic;
 }
 
+/////////////// recipe_list ///////////////
+
+$recipe-list-margin: 4px;
+
+.recipe-list {
+    overflow: hidden;
+
+    @media screen and (min-width: $page-gutter-width) {
+        overflow: visible;
+    }
+}
+
+.recipe-list-overflow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-content: flex-start;
+    margin: 0 -$recipe-list-margin;
+
+    @media screen and (min-width: 768px) {
+        margin: 0 -2*$recipe-list-margin;
+    }
+}
+
+.recipe-list-gutter {
+    flex-grow: 1;
+
+    flex-basis: 150px;
+
+    @media screen and (min-width: 768px) {
+        flex-basis: 290px;
+    }
+}
+
+.recipe-list-item {
+    background-color: #f7f7ee;
+    margin: 0 $recipe-list-margin 2*$recipe-list-margin;
+
+    box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.3);
+
+    @media screen and (min-width: 768px) {
+        margin: 0 2*$recipe-list-margin 4*$recipe-list-margin;
+    }
+
+    a {
+        text-decoration: none;
+    }
+}
+
+.recipe-list-image {
+    width: 100%;
+    padding-top: 55%;
+    position: relative;
+
+    img {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        object-fit: cover;
+        object-position: 50% 50%;
+    }
+}
+
+$recipe-list-desc-lh: 21px;
+.recipe-list-desc {
+    padding: 10px;
+}
+
+.recipe-list-name {
+    font-weight: bold;
+    color: black;
+    display: block;
+    height: 3 * $recipe-list-desc-lh;
+    line-height: $recipe-list-desc-lh;
+}
+
+.recipe-list-tags {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-content: space-between;
+    align-items: flex-end;
+    height: 41px;
+    flex-wrap: wrap;
+
+    .tag {
+        flex-grow: 0;
+        width: auto;
+        font-size: 12px;
+        line-height: 12px;
+        height: 14px;
+        margin-right: 1px;
+    }
+}

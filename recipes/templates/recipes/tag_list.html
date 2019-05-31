@@ -1,0 +1,7 @@
+{% for tag in tag_list %}
+    <a style="color:{{ tag.font }};background-color:{{ tag.color }};"
+       href="{% url 'recipes:search' %}?tag={{ tag.pk }}"
+       class="tag">
+        {{ tag.name }}
+    </a>
+{% endfor %}

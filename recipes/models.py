@@ -1,12 +1,9 @@
-import os
 import random
-
-from django.core.files.storage import FileSystemStorage
 from django.db import models
 import re
+from django.urls import reverse
 from django.utils import timezone
 
-from recipy.settings import MEDIA_ROOT
 
 
 class Tag(models.Model):
@@ -81,6 +78,9 @@ class Recipe(models.Model):
         if not self.id:
             self.creationdate = timezone.now()
         return super(Recipe, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('recipes:recipe_detail', kwargs={'pk': self.pk})
 
 
 class Ingredient(models.Model):

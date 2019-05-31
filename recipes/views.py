@@ -40,9 +40,12 @@ def index(request):
 
 class RecipeDetailsView(DetailView):
     model = Recipe
+    context_object_name = 'recipe'
 
 
 def search(request):
+    context = {}
+
     if request.method == 'GET':
         query = request.GET.get('searchstring')
         submitbutton = request.GET.get('submit')
@@ -50,10 +53,12 @@ def search(request):
         if query is not None:
             lookups = Q(title__icontains=query)
             results = Recipe.objects.filter(lookups).distinct()
-            context = {'results': results,
-                       'submitbutton': submitbutton}
-            return render(request, 'recipes/search.html', context)
-        else:
-            return render(request, 'recipes/search.html')
-    else:
-        return render(request, 'recipes/search.html')
+
+            context.update(
+                results=results,
+                submitbutton=submitbutton,
+            )
+
+    return render(request, 'recipes/search.html', context=context)
+
+
