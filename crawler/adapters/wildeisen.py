@@ -28,11 +28,13 @@ class Wildeisen(BatchCrawler):
 
         try:
             result = {
+                'input': self.input,
                 'success': True,
                 'result': await self.save(),
             }
         except ImportException as e:
             result = {
+                'input': self.input,
                 'success': False,
                 'result': str(e),
             }

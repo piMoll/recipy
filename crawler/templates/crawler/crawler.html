@@ -1,13 +1,13 @@
 <form method="post" class="crawler-form">
     {{ form.as_p }}
     {% csrf_token %}
-    <input type="submit" value="Import">
+    <input type="submit" value="Importieren">
 </form>
-{% if processed_imports %}
+{% if import_result %}
 <div class="crawler-response">
     <pre>
         <code>
-{{ processed_imports }}
+{{ import_result }}
         </code>
     </pre>
 </div>

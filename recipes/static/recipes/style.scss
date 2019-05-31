@@ -4,6 +4,9 @@ body {
     margin: 0;
     padding: 0;
 
+    //@media screen and (max-width: 768px) {
+    //    font-size: 12px;
+    //}
 }
 
 .recipe {}
@@ -214,7 +217,6 @@ $recipe-list-desc-lh: 21px;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    align-content: space-between;
     align-items: flex-end;
     height: 41px;
     flex-wrap: wrap;
@@ -227,4 +229,114 @@ $recipe-list-desc-lh: 21px;
         height: 14px;
         margin-right: 1px;
     }
+}
+
+/////////////// page_header ///////////////
+
+$header-color: #073642;
+$header-font: white;
+
+.page-header {
+    background-color: $header-color;
+    &, a {
+        color: $header-font;
+    }
+}
+
+.header-nav {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    height: 72px;
+    padding: 0 8px;
+}
+
+.header-buttons-left, .header-buttons-right {
+    //flex-basis: 1px;
+    flex-grow: 0;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.header-button {
+    width: 72px;
+    height: 72px;
+    position: relative;
+
+    a {
+        width: 100%;
+        height: 100%;
+
+        &:after {
+            content: '';
+            display: block;
+            width: 32px;
+            height: 32px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    }
+}
+
+.button-home a:after {
+    background-image: url("home_" + $header-font + ".png");
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+}
+
+.button-import a:after {
+    background-image: url("crawler_" + $header-font + ".png");
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+}
+
+.button-create a:after {
+    background-image: url("create_" + $header-font + ".png");
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+}
+
+.button-edit a:after {
+    background-image: url("edit_" + $header-font + ".png");
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+}
+
+/////////////// recipe_search ///////////////
+
+.search {
+    padding-bottom: 16px;
+}
+
+.search form {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.search-string {
+    border: none;
+    padding: 8px 16px;
+    line-height: 30px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-submit {
+    position: absolute;
+    //height: 46px;
+    top: 0;
+    right: 0;
+    border: none;
+    padding: 8px;
+
+    display: block;
+    width: 30px;
+    height: 30px;
+    background: url("search_black.png") no-repeat 8px 8px;
+    background-size: 30px 30px;
+    font-size: 0;
+    box-sizing: content-box;
 }

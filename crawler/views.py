@@ -16,7 +16,6 @@ class ImportForm(forms.Form):
 class ImportView(FormView):
     template_name = 'crawler/index.html'
     form_class = ImportForm
-    success_url = '.'
 
     def form_valid(self, form):
         """
@@ -25,18 +24,21 @@ class ImportView(FormView):
         handler = form.cleaned_data['adapter']
         titles = form.cleaned_data['titles'].split('\r\n')
 
-        imported_recipes = handler(titles)
+        processed_imports = handler(titles)
 
         success = any(
-            job['success'] for job in imported_recipes.values()
+            job['success'] for job in processed_imports.values()
         )
 
         import_result = {
             'success': success,
-            'data': imported_recipes,
+            'data': processed_imports,
         }
         import_result = json.dumps(import_result, indent=4, ensure_ascii=False)
 
-        self.extra_context = {"processed_imports": import_result}
+        self.extra_context = {
+            'import_result': import_result,
+            'processed_imports': processed_imports.values()
+        }
 
         return self.render_to_response(self.get_context_data())

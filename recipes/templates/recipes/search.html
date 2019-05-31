@@ -1,26 +1,55 @@
 {% extends 'base.html' %}
 
 
-{% block title %}Rezeptsuche{% if submitbutton %}: {{ request.GET.searchstring }}{% endif %}{% endblock %}
+{% block title %}Rezeptsuche{% if search_results %}: {{ search_string }}{% endif %}{% endblock %}
+
+
+{% block header-after %}
+<div class="gutter search">
+    <h1>Rezeptsuche</h1>
+
+    <form method="get">
+        <input class="search-string" type="text" name="search_string" value="{{ search_string }}" placeholder="Nach Rezept, Zutat, etc. suchen">
+        {% for tag, _ , state in tag_list %}
+            {% if state %}
+                <input type="hidden" name="tag.{{ tag.name }}" value="{{ state }}">
+            {% endif %}
+        {% endfor %}
+
+        <input class="search-submit" type="submit" value="Suchen"/>
+    </form>
+
+    <div class="search-tags">
+        {% for tag, query, state in tag_list %}
+            <a style="color:{{ tag.font }};background-color:{{ tag.color }};"
+               href="?{{ query }}"
+               class="tag">
+                {{ tag.name }}
+            </a>
+        {% endfor %}
+
+        {% if reset_tags %}
+            <a style="color:white;background-color:red;"
+               href="?{{ reset_tags }}"
+               class="tag">
+                Tags zurücksetzen.
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
 
 
 {% block content %}
-<h1>Rezeptsuche</h1>
-
-<form action="" method="GET">
-    <input type="text" name="searchstring" value="{{request.GET.searchstring}}" placeholder="Nach Rezept, Zutat, etc. suchen"/>
-    <input type="submit" name="submit" value="Search"/>
-</form>
-
-<div class="gutter">
-    {% if submitbutton == 'Search' and request.GET.searchstring != '' %}
-        {% if results %}
-            <h3>Resultate für: <b>{{ request.GET.searchstring }}</b></h3>
-            {% include 'recipes/recipe_list.html' with recipe_list=results %}
+{% if search_string %}
+    <div class="gutter search-results">
+        {% if search_results %}
+            <h3>Resultate für: {{ search_string }}</h3>
+            {% include 'recipes/recipe_list.html' with recipe_list=search_results %}
         {% else %}
-            No search results for this query
+            <h3>Keine Rezepte gefunden :(</h3>
         {% endif %}
-    {% endif %}
-</div>
+    </div>
+{% endif %}
 {% endblock %}
 

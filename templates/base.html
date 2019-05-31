@@ -18,7 +18,30 @@
 </head>
 <body>
 
-{% block header %}{% endblock %}
+{% block header %}
+    <div class="page-header">
+        <div class="header-nav">
+            <div class="header-buttons-left">
+                {% block header-left %}
+                    <div class="header-button button-home">
+                        <a href="/"></a>
+                    </div>
+                {% endblock %}
+            </div>
+            <div class="header-buttons-right">
+                {% block header-right %}
+                    <div class="header-button button-import">
+                        <a href="{% url 'crawler:index' %}"></a>
+                    </div>
+                    <div class="header-button button-create">
+                        <a href="{% url 'recipes:search' %}"></a>
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+        {% block header-after %}{% endblock %}
+    </div>
+{% endblock %}
 
 {% block content %}{% endblock %}
 
