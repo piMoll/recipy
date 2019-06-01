@@ -1,11 +1,51 @@
 from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse, HttpResponseRedirect
 from .models import Tag, Recipe, Ingredient, Direction, Picture
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormView
+from .forms import RecipeCreateForm
+from django.forms import inlineformset_factory
 
 
 class RecipeDetailsView(DetailView):
     model = Recipe
     context_object_name = 'recipe'
+
+
+class RecipeCreate(FormView):
+    form_class = RecipeCreateForm
+    template_name = 'recipes/recipe_create.html'
+    success_url = '.'
+    
+    def form_valid(self, form):
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        return {
+            'formset': inlineformset_factory(Recipe, Ingredient, fields=(
+                'quantity', 'name'))
+        }
+
+
+def create(request):
+    RecipeIngredientSet = inlineformset_factory(Recipe, Ingredient, fields=(
+        'quantity', 'name'
+    ))
+    formset = RecipeIngredientSet()
+    
+    # if request.method == "POST":
+    #     formset = RecipeIngredientSet(request.POST, request.FILES,
+    #                                 instance=author)
+    #     if formset.is_valid():
+    #         formset.save()
+    #         # Do something. Should generally end with a redirect. For example:
+    #         return HttpResponseRedirect(author.get_absolute_url())
+    # else:
+    
+    return render(request, 'recipes/recipe_create.html', {
+        'formset': formset,
+        'form': RecipeCreateForm()
+    })
 
 
 def get_next_tag_state(state):
