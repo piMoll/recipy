@@ -36,12 +36,14 @@ body {
   align-items: flex-start; }
 
 .tag {
+  border: 2px solid transparent;
   border-radius: 5px;
   display: inline-block;
-  margin-right: 8px;
+  margin: 0 5px 9px 0;
   padding: 3px 6px;
   font-weight: bold;
-  text-decoration: none; }
+  text-decoration: none;
+  box-shadow: 3px 3px 2px #292929; }
 
 .recipe-times {
   margin: 10px 0 15px 0;
@@ -174,7 +176,7 @@ body {
     margin-right: 1px; }
 
 .page-header {
-  background-color: #073642; }
+  background-color: #1a4854; }
   .page-header, .page-header a {
     color: white; }
 
@@ -254,3 +256,11 @@ body {
   background-size: 30px 30px;
   font-size: 0;
   box-sizing: content-box; }
+
+.include-tag {
+  text-decoration: underline;
+  box-shadow: 3px 3px 2px #292929, inset 3px 3px 3px #292929c2; }
+
+.exclude-tag {
+  text-decoration: line-through;
+  box-shadow: 3px 3px 2px #292929, inset 3px 3px 3px #292929c2; }
