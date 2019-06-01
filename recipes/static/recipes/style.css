@@ -239,7 +239,9 @@ body {
   line-height: 30px;
   display: block;
   width: 100%;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  color: #657b83;
+  background-color: #fdf6e3; }
 
 .search-submit {
   position: absolute;

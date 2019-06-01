@@ -57,8 +57,12 @@ def search(request):
             reset_tags=reset_tags
         )
 
-        query = Recipe.objects
+        random_sample = Recipe.objects.order_by('?')[:6]
 
+        query = Recipe.objects.all().distinct()
+        query_ = query
+
+        # TODO: optimize? //stackoverflow.com/a/8637972/4427997
         for tag in Tag.objects.all():
             if not request.GET.get(f'tag.{tag.name}', False):
                 continue
@@ -74,7 +78,12 @@ def search(request):
 
             context.update(
                 search_string=search_string,
-                search_results=query.distinct(),
             )
+
+        result = random_sample if query is query_ else query
+
+        context.update(
+            search_results=result,
+        )
 
     return render(request, 'recipes/search.html', context=context)

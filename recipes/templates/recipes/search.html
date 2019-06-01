@@ -43,15 +43,13 @@
 
 
 {% block content %}
-{% if search_string %}
-    <div class="gutter search-results">
-        {% if search_results %}
-            <h3>Resultate für: {{ search_string }}</h3>
-            {% include 'recipes/recipe_list.html' with recipe_list=search_results %}
-        {% else %}
-            <h3>Keine Rezepte gefunden :(</h3>
-        {% endif %}
-    </div>
-{% endif %}
+<div class="gutter search-results">
+    {% if search_results %}
+        <h3>Resultate{% if search_string %} für: {{ search_string }}{% endif %}</h3>
+        {% include 'recipes/recipe_list.html' with recipe_list=search_results %}
+    {% else %}
+        <h3>Keine Rezepte gefunden :(</h3>
+    {% endif %}
+</div>
 {% endblock %}
 

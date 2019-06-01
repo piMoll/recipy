@@ -3,10 +3,6 @@ body {
     font-size: 18px;
     margin: 0;
     padding: 0;
-
-    //@media screen and (max-width: 768px) {
-    //    font-size: 12px;
-    //}
 }
 
 .recipe {}
@@ -322,6 +318,8 @@ $header-font: white;
     display: block;
     width: 100%;
     box-sizing: border-box;
+    color: #657b83;
+    background-color: #fdf6e3;
 }
 
 .search-submit {
