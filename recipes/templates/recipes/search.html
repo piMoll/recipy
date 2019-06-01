@@ -10,6 +10,8 @@
 
     <form method="get">
         <input class="search-string" type="text" name="search_string" value="{{ search_string }}" placeholder="Nach Rezept, Zutat, etc. suchen">
+
+        {# persist tags if search_string changes #}
         {% for tag, _ , state in tag_list %}
             {% if state %}
                 <input type="hidden" name="tag.{{ tag.name }}" value="{{ state }}">

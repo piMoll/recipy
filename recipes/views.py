@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from .models import Tag, Recipe, Ingredient, Direction, Picture
 from django.views.generic.detail import DetailView
-from django.db.models import Q
 
 
 class RecipeDetailsView(DetailView):
@@ -35,9 +34,6 @@ def get_next_tag_states(request):
         if current_state is not None:
             reset_tags = True
 
-        # flatten the values, so urlencode(doseq=True) actually works
-        # params = [(key, value) for key in params for value in params[key]]
-        # query = parse.urlencode(params, doseq=True)
         query = params.urlencode()
         result.append((tag, query, current_state))
 
@@ -52,9 +48,7 @@ def get_next_tag_states(request):
 
 
 def search(request):
-    context = {
-        'tag_list': Tag.objects.all(),
-    }
+    context = {}
 
     if request.method == 'GET':
         tag_list, reset_tags = get_next_tag_states(request)
@@ -63,14 +57,24 @@ def search(request):
             reset_tags=reset_tags
         )
 
+        query = Recipe.objects
+
+        for tag in Tag.objects.all():
+            if not request.GET.get(f'tag.{tag.name}', False):
+                continue
+            val = request.GET.get(f'tag.{tag.name}')
+            if val == 'y':
+                query = query.filter(tags=tag)
+            elif val == 'n':
+                query = query.exclude(tags=tag)
+
         search_string = request.GET.get('search_string')
         if search_string is not None:
-            query = Q(title__icontains=search_string)
-            results = Recipe.objects.filter(query).distinct()
+            query = query.filter(title__icontains=search_string)
 
             context.update(
                 search_string=search_string,
-                search_results=results,
+                search_results=query.distinct(),
             )
 
     return render(request, 'recipes/search.html', context=context)
