@@ -259,12 +259,13 @@ class Wildeisen(BatchCrawler):
                 rest = [tag.string or '' for tag in contents]  # get strings
                 rest = [text.strip() for text in rest if text.strip()]  # remove empty strings
                 name = ' '.join(rest)
+                j += 1
 
                 ingredient = Ingredient(
                     quantity=quantity,
                     name=name,
                     group=group,
-                    order_item=++j,
+                    order_item=j,
                     recipe_id=recipe_id
                 )
                 ingredients.append(ingredient)
