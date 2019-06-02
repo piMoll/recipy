@@ -43,6 +43,11 @@
     <div class="recipe-details gutter">
         <section class="ingredients">
             <h3 class="section-title">Zutaten</h3>
+                {% if recipe.portion_unit %}
+                <div class="ingredient-portion">
+                    <div>ergibt {{ recipe.portion_quantity|floatformat }} {{ recipe.get_portion_unit_display }}</div>
+                </div>
+                {% endif %}
                 <div class="ingredient-details">
                     {% regroup recipe.ingredient_set.all by group as ingredient_set %}
                     {% for group in ingredient_set %}
@@ -61,6 +66,17 @@
                         </div>
                     {% endfor %}
                 </div>
+            {% if recipe.nutrition_kcal %}
+            <div class="nutrition">
+                <div class="nutrition-title">Nährwert pro Portion</div>
+                <ul class="nutrition-list">
+                    <li>{{ recipe.nutrition_kcal|floatformat }} kcal</li>
+                    <li>{{ recipe.nutrition_carbs|floatformat }} g Kohlenhydrate</li>
+                    <li>{{ recipe.nutrition_fat|floatformat }} g Fett</li>
+                    <li>{{ recipe.nutrition_protein|floatformat }} g Eiweiss</li>
+                </ul>
+            </div>
+            {% endif %}
         </section>
 
         <section class="directions">

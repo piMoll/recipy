@@ -37,10 +37,7 @@ $page-gutter-width: 900px;
 .description {
     display: flex;
     flex-direction: column;
-    border: 0 solid #073642;
     padding-bottom: 15px;
-    border-bottom-width: 8px;
-    border-radius: 8px;
 }
 .tags {
     display: flex;
@@ -74,7 +71,7 @@ $page-gutter-width: 900px;
 .recipe-details {}
 
 .section-title {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .ingredients {
@@ -84,6 +81,8 @@ $page-gutter-width: 900px;
     margin-top: 20px;
     margin-right: 2%;
 }
+.ingredient-portion {}
+
 .ingredient-details {
 }
 .ingredient-list {
@@ -107,6 +106,19 @@ $page-gutter-width: 900px;
 }
 
 .ingredient-name {}
+
+.nutrition {
+    margin-top: 40px;
+    font-style: italic;
+    font-size: 16px;
+}
+.nutrition-title {}
+
+.nutrition-list {
+    margin-top: 8px;
+    list-style-type: none;
+    padding-left: 20px;
+}
 
 .directions {
     display: block;
@@ -226,6 +238,7 @@ $recipe-list-desc-lh: 21px;
         line-height: 12px;
         height: 14px;
         margin-right: 1px;
+        box-shadow: 2px 2px 2px #929292;
     }
 }
 

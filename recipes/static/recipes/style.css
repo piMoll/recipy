@@ -25,10 +25,7 @@ body {
 .description {
   display: flex;
   flex-direction: column;
-  border: 0 solid #073642;
-  padding-bottom: 15px;
-  border-bottom-width: 8px;
-  border-radius: 8px; }
+  padding-bottom: 15px; }
 
 .tags {
   display: flex;
@@ -58,7 +55,7 @@ body {
   margin-right: 8px; }
 
 .section-title {
-  margin-bottom: 15px; }
+  margin-bottom: 20px; }
 
 .ingredients {
   display: block;
@@ -83,6 +80,16 @@ body {
 
 .ingredient-quantity {
   font-weight: bold; }
+
+.nutrition {
+  margin-top: 40px;
+  font-style: italic;
+  font-size: 16px; }
+
+.nutrition-list {
+  margin-top: 8px;
+  list-style-type: none;
+  padding-left: 20px; }
 
 .directions {
   display: block;
@@ -173,7 +180,8 @@ body {
     font-size: 12px;
     line-height: 12px;
     height: 14px;
-    margin-right: 1px; }
+    margin-right: 1px;
+    box-shadow: 2px 2px 2px #929292; }
 
 .page-header {
   background-color: #1a4854; }
