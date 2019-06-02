@@ -82,7 +82,7 @@ def createTestData():
             name='Parmesan',
             quantity='50g',
             group='Teig',
-            order_item=6,
+            order_item=7,
             order_group=2,
             recipe=recipe
         )
@@ -90,7 +90,7 @@ def createTestData():
             name='schwarzer Pfeffer',
             quantity='',
             group='Teig',
-            order_item=7,
+            order_item=8,
             order_group=2,
             recipe=recipe
         )
