@@ -34,7 +34,7 @@
                         <a href="{% url 'crawler:index' %}"></a>
                     </div>
                     <div class="header-button button-create">
-                        <a href="{% url 'recipes:search' %}"></a>
+                        <a href="{% url 'recipes:create' %}"></a>
                     </div>
                 {% endblock %}
             </div>
@@ -46,6 +46,7 @@
 {% block content %}{% endblock %}
 
 {% block js-foot %}{% endblock %}
+<script type="text/javascript">document.body.classList.add('ready')</script>
 
 </body>
 </html>

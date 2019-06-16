@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.utils import timezone
 
 
-
 class Tag(models.Model):
     BRIGHT = 'rgb(253, 246, 227)'
     DARK = 'rgb(0, 43, 54)'
@@ -27,6 +26,9 @@ class Tag(models.Model):
             if (int(red) * 0.299 + int(green) * 0.587 + int(blue) * 0.114) > 186
             else self.BRIGHT
         )
+
+    def query_key(self):
+        return f'tag.{self.name}'
     
     def __str__(self):
         return self.name
@@ -80,7 +82,7 @@ class Recipe(models.Model):
         return super(Recipe, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('recipes:recipe_detail', kwargs={'pk': self.pk})
+        return reverse('recipes:detail', kwargs={'pk': self.pk})
 
 
 class Ingredient(models.Model):

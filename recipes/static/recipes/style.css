@@ -1,13 +1,23 @@
+@charset "UTF-8";
 body {
   font-family: sans-serif;
   font-size: 18px;
   margin: 0;
   padding: 0; }
+  @media screen and (max-width: 768px) {
+    body {
+      font-size: 16px; } }
 
 .gutter {
   max-width: 900px;
   margin: auto;
-  display: block; }
+  display: block;
+  padding-left: 5px;
+  padding-right: 5px; }
+  @media screen and (min-width: 900px) {
+    .gutter {
+      padding-left: 0;
+      padding-right: 0; } }
 
 .title {
   margin: 20px auto 10px auto;
@@ -43,7 +53,8 @@ body {
   padding: 3px 6px;
   font-weight: bold;
   text-decoration: none;
-  box-shadow: 3px 3px 2px #292929; }
+  box-shadow: 3px 3px 2px #292929;
+  cursor: pointer; }
 
 .recipe-times {
   margin: 10px 0 15px 0;
@@ -228,6 +239,20 @@ body {
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
+.button-save input {
+  padding: 0;
+  border: 0;
+  display: block;
+  font-size: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  background-color: transparent;
+  background-image: url("save_white.png");
+  background-position: 20px 20px;
+  background-repeat: no-repeat;
+  background-size: 32px 32px; }
+
 .search {
   padding-bottom: 16px; }
 
@@ -266,3 +291,156 @@ body {
 .exclude-tag {
   text-decoration: line-through;
   box-shadow: 3px 3px 2px #292929, inset 3px 3px 3px #292929c2; }
+
+.flex-row {
+  display: flex;
+  flex-direction: row; }
+  .flex-row .flex-40 {
+    flex-basis: 40%;
+    flex-grow: 1; }
+    .flex-row .flex-40 ~ [class*="flex-"] {
+      margin-left: 10px; }
+  .flex-row .flex-50 {
+    flex-basis: 50%;
+    flex-grow: 1; }
+    .flex-row .flex-50 ~ [class*="flex-"] {
+      margin-left: 10px; }
+  .flex-row .flex-60 {
+    flex-basis: 60%;
+    flex-grow: 1; }
+    .flex-row .flex-60 ~ [class*="flex-"] {
+      margin-left: 10px; }
+  .flex-row .flex-100 {
+    flex-basis: 100%;
+    flex-grow: 1; }
+    .flex-row .flex-100 ~ [class*="flex-"] {
+      margin-left: 10px; }
+
+.md-select {
+  font-size: 1em;
+  margin: 0.6em 0 0; }
+  .md-select select {
+    font-size: 1em;
+    display: block;
+    width: 100%;
+    height: 100%; }
+
+.md-text-input {
+  position: relative;
+  font-size: 1rem;
+  margin: 0.6rem 0 0; }
+  .md-text-input.md-lg {
+    font-size: 1.4rem; }
+  .md-text-input input, .md-text-input textarea {
+    font-size: 1em;
+    border: 1px solid black;
+    border-radius: .3em;
+    padding: 10px 16px;
+    margin: 0;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    line-height: 1.2em;
+    resize: vertical;
+    height: calc(1.2em + 22px); }
+  .md-text-input label {
+    position: absolute;
+    background: white;
+    top: -0.48rem;
+    font-size: 0.8rem;
+    left: 14px;
+    padding: 0 3px;
+    transition: none; }
+    body.ready .md-text-input label {
+      transition: top 10ms linear, left 10ms linear; }
+  .md-text-input input.blank:not(:focus) + label, .md-text-input textarea.blank:not(:focus) + label {
+    font-size: 1em;
+    top: 11px;
+    opacity: 0.6; }
+
+.create-tag ul {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  width: 100%;
+  flex-wrap: wrap; }
+
+.create-tag li {
+  flex: auto 0; }
+
+.create-tag input {
+  display: none; }
+
+.create-tag :checked + .tag {
+  text-decoration: underline;
+  box-shadow: 3px 3px 2px #292929, inset 3px 3px 3px #292929c2; }
+
+#create-recipe input[type="checkbox"][name$="DELETE"] {
+  display: none; }
+
+.create-ingredient {
+  margin-left: 1rem;
+  position: relative; }
+  :checked + .create-ingredient > :not(.ingredient-delete) {
+    visibility: hidden; }
+  :checked + .create-ingredient:after {
+    content: 'Gelöscht';
+    position: absolute;
+    height: calc(1.2em + 20px);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: .3em;
+    background-color: lightblue;
+    display: flex;
+    justify-content: center;
+    /* align horizontal */
+    align-items: center;
+    /* align vertical */ }
+
+.ingredient-delete {
+  position: absolute;
+  margin-right: 1rem;
+  right: 100%;
+  bottom: 0; }
+
+.create-direction {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  align-items: flex-start; }
+  :checked + .create-direction > :not(.direction-delete) {
+    visibility: hidden; }
+  :checked + .create-direction:after {
+    content: 'Gelöscht';
+    position: absolute;
+    height: calc(1.2em + 20px);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: .3em;
+    background-color: lightblue;
+    display: flex;
+    justify-content: center;
+    /* align horizontal */
+    align-items: center;
+    /* align vertical */ }
+
+.direction-delete {
+  margin-left: 0.8rem;
+  margin-top: 0.6rem;
+  order: 2; }
+
+.direction-delete, .ingredient-delete {
+  height: calc(1.2em + 20px);
+  width: calc(1.2em + 20px); }
+  .direction-delete label, .ingredient-delete label {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background-image: url("delete_black.png");
+    background-size: 70% 70%;
+    background-position: 30% 30%;
+    background-repeat: no-repeat;
+    font-size: 0;
+    opacity: 0.6; }

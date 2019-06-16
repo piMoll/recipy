@@ -5,6 +5,14 @@
 {% block title %}Rezept: {{ recipe.title }}{% endblock %}
 
 
+{% block header-right %}
+<div class="header-button button-edit">
+    <a href="{% url 'recipes:edit' pk=recipe.pk%}"></a>
+</div>
+{{ block.super }}
+{% endblock %}
+
+
 {% block content %}
 <div class="recipe">
     <div class="recipe-header gutter">

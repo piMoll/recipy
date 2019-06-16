@@ -26,6 +26,8 @@ SECRET_KEY = 'l(4kus0(49woz9vi8j&*n(!!ngne2h#w=3lztlw*mp)h#or6vi'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+if os.getenv('HOST', None):
+    ALLOWED_HOSTS.append(os.getenv('HOST'))
 
 
 # Application definition
