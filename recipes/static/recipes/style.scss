@@ -1,15 +1,16 @@
-body {
+html {
     font-family: sans-serif;
-    font-size: 18px;
-    margin: 0;
-    padding: 0;
+    font-size: 15px;
 
-    @media screen and (max-width: 768px){
+    @media screen and (min-width: 768px) {
         font-size: 16px;
     }
 }
 
-.recipe {}
+body {
+    margin: 0;
+    padding: 0;
+}
 
 $page-gutter-width: 900px;
 
@@ -17,31 +18,45 @@ $page-gutter-width: 900px;
     max-width: $page-gutter-width;
     margin: auto;
     display: block;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 0 5px;
 
-    @media screen and (min-width: 900px) {
-        padding-left: 0;
-        padding-right: 0;
+    @media screen and (min-width: $page-gutter-width) {
+        padding: 0;
     }
 }
 
 
+/////////////// recipe_detail ///////////////
+
+.recipe {}
+
 .recipe-header {}
 
 .title {
-    margin: 20px auto 10px auto;
+    font-size: 1.6rem;
+    margin: 0.8em auto 0.5em auto;
     display: block;
-    font-size: 45px;
+
+    @media screen and (min-width: 768px) {
+        font-size: 2.8rem;
+    }
 }
+
 .image {
+    margin: 0 -5px;
     img {
-        width: 900px;
-        max-height: 550px;
-        margin: 0 auto;
+        width: 100%;
+        max-height: 320px;
         display: block;
         object-fit: cover;
         object-position: 50% 50%;
+    }
+
+    @media screen and (min-width: 768px) {
+        margin: 0;
+        img {
+            max-height: 550px;
+        }
     }
 }
 
@@ -53,66 +68,114 @@ $page-gutter-width: 900px;
     border-bottom-width: 8px;
     border-radius: 8px;
 }
+
 .tags {
     display: flex;
-    margin: 10px 0;
+    margin: 0.5rem 0;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
+
 .tag {
     border: 2px solid transparent;
     border-radius: 5px;
     display: inline-block;
-    margin: 0 5px 9px 0;
-    padding: 3px 6px;
+    margin: 0 0.4em 0.6em 0;
+    padding: 0.2em 0.3em;
+    font-size: 1rem;
     font-weight: bold;
     text-decoration: none;
-    box-shadow: 3px 3px 2px #292929;
-
+    box-shadow: 2px 2px 2px #adadad;
     cursor: pointer;
+
+    &.darkbg {
+        box-shadow: 2px 2px 2px #292929;
+    }
 }
 
 .recipe-times {
-    margin: 10px 0 15px 0;
+    margin: 0.5rem 0;
     display: flex;
+    line-height: 1.5rem;
+    flex-direction: column;
+
+    @media screen and (min-width: 768px) {
+        flex-direction: row;
+    }
 }
 .duration-type {
     display: flex;
-    margin-right: 50px;
+    margin-right: 4rem;
 }
+
 .duration-title {
     font-weight: bold;
-    margin-right: 8px;
+    margin-right: 0.4rem;
 }
 
 .recipe-details {}
 
 .section-title {
-    margin-bottom: 15px;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+
+    // TODO
+    padding: 0.5rem;
+    border: 0 solid lightgrey;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-top-right-radius: 3px;
+    width: 50%;
+
+
+    .is-active {
+
+    }
+
+    @media screen and (min-width: 768px) {
+        font-size: 1.3rem;
+        border: none;
+    }
 }
+
+.section-content {
+    // TODO
+}
+
+
+//// Section: Ingredients
 
 .ingredients {
     display: block;
-    float: left;
-    width: 30%;
-    margin-top: 20px;
-    margin-right: 2%;
+    margin-top: 1.4rem;
+
+    @media screen and (min-width: 768px) {
+        float: left;
+        width: 30%;
+        margin-right: 2%;
+    }
 }
+
+.ingredient-portion {}
+
 .ingredient-details {
 }
 .ingredient-list {
-    padding-left: 20px;
+    margin: 1rem 0;
+    padding-left: 1.2rem;
     list-style-type: none;
 }
+
 .ingredients-group {
-    margin: 20px 0 10px 0;
+    margin: 1.2rem 0 0.8rem 0;
 }
 
 .ingredient-item {
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 30px;
-    padding-left: 15px;
-    text-indent: -15px;
+    line-height: 2rem;
+    padding-left: 1.2rem;
+    text-indent: -1.2rem;
 }
 
 .ingredient-quantity {
@@ -121,26 +184,51 @@ $page-gutter-width: 900px;
 
 .ingredient-name {}
 
+.nutrition {
+    margin: 2rem 0 3rem 0;
+    font-style: italic;
+    font-size: 0.85rem;
+}
+
+.nutrition-title {
+    font-weight: normal;
+    margin: 0;
+}
+
+.nutrition-list {
+    margin-top: 0.5rem;
+    list-style-type: none;
+    padding-left: 1.2rem;
+}
+
+
+//// Section: Directions
+
 .directions {
     display: block;
-    float: left;
-    width: 66%;
-    margin-top: 20px;
+    margin-top: 1.4rem;
+
+    @media screen and (min-width: 768px) {
+        float: left;
+        width: 66%;
+    }
 }
 
 .direction-row {
     display: flex;
-    margin: 20px 0 20px 20px;
+    margin: 1.2rem 0 1.2rem 1.2rem;
 }
 .direction-step {
-    font-size: 30px;
-    margin-right: 10px;
+    line-height: 1;
+    font-size: 1.4rem;
+    font-weight: normal;
+    margin: 0 0.7rem 0 0;
 }
 .direction-text {}
 
 
 .recipe-notes {
-    margin: 50px 0 20px 50px;
+    margin: 3rem 0 1rem 2.6rem;
     font-style: italic;
 }
 
@@ -239,6 +327,7 @@ $recipe-list-desc-lh: 21px;
         line-height: 12px;
         height: 14px;
         margin-right: 1px;
+        box-shadow: 2px 2px 2px #929292;
     }
 }
 

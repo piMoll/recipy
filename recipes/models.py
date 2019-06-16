@@ -92,6 +92,9 @@ class Ingredient(models.Model):
     group = models.CharField(max_length=100, blank=True, default='')
     order_item = models.IntegerField()
     
+    class Meta:
+        ordering = ['order_item']
+    
     def __str__(self):
         return f'{self.quantity} {self.name}'
 
@@ -100,6 +103,9 @@ class Direction(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     step = models.IntegerField()
     description = models.TextField()
+    
+    class Meta:
+        ordering = ['step']
     
     def __str__(self):
         return f'{self.step}. {self.description}'

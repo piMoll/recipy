@@ -14,16 +14,16 @@
 
 
 {% block content %}
-<div class="recipe">
-    <div class="recipe-header gutter">
+<div class="recipe gutter">
+    <div class="recipe-header">
         <section class="">
             <div class="image">
                 {% if recipe.picture_set.get %}
                     <img src="{{ recipe.picture_set.get.image.url }}" alt="{{ recipe.title }}">
                 {% endif %}
             </div>
-            <h1 class="title gutter">{{ recipe.title }}</h1>
-            <aside class="description gutter">
+            <h1 class="title">{{ recipe.title }}</h1>
+            <aside class="description">
                 <div class="tags">
                     {% include 'recipes/tag_list.html' with tag_list=recipe.tags.all %}
                 </div>
@@ -48,46 +48,65 @@
         </section>
     </div>
 
-    <div class="recipe-details gutter">
+    <div class="recipe-details">
         <section class="ingredients">
             <h3 class="section-title">Zutaten</h3>
-                <div class="ingredient-details">
-                    {% regroup recipe.ingredient_set.all by group as ingredient_set %}
-                    {% for group in ingredient_set %}
-                        <div>
-                            <div class="ingredients-group">{{ group.grouper|upper }}</div>
-                            <ul class="ingredient-list">
-                                {% for ingredient in group.list %}
-                                    <li class="ingredient-item">
-                                        <span class="ingredient-quantity"> {{ ingredient.quantity }} </span>
-                                        <span class="ingredient-name"> {{ ingredient.name }} </span>
-                                    </li>
-                                {% empty %}
-                                    <li class="ingredient-item"> Keine Zutaten gefunden</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endfor %}
+                <div class="section-content">
+                    {% if recipe.portion_unit %}
+                    <div class="ingredient-portion">
+                        <div>ergibt {{ recipe.portion_quantity|floatformat }} {{ recipe.get_portion_unit_display }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="ingredient-details">
+                        {% regroup recipe.ingredient_set.all by group as ingredient_set %}
+                        {% for group in ingredient_set %}
+                            <div>
+                                <div class="ingredients-group">{{ group.grouper|upper }}</div>
+                                <ul class="ingredient-list">
+                                    {% for ingredient in group.list %}
+                                        <li class="ingredient-item">
+                                            <span class="ingredient-quantity"> {{ ingredient.quantity }} </span>
+                                            <span class="ingredient-name"> {{ ingredient.name }} </span>
+                                        </li>
+                                    {% empty %}
+                                        <li class="ingredient-item"> Keine Zutaten gefunden</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if recipe.nutrition_kcal %}
+                    <div class="nutrition">
+                        <h4 class="nutrition-title">Nährwert pro Portion</h4>
+                        <ul class="nutrition-list">
+                            <li>{{ recipe.nutrition_kcal|floatformat }} kcal</li>
+                            <li>{{ recipe.nutrition_carbs|floatformat }} g Kohlenhydrate</li>
+                            <li>{{ recipe.nutrition_fat|floatformat }} g Fett</li>
+                            <li>{{ recipe.nutrition_protein|floatformat }} g Eiweiss</li>
+                        </ul>
+                    </div>
+                    {% endif %}
                 </div>
         </section>
 
         <section class="directions">
             <h3 class="section-title">Zubereitung</h3>
+                <div class="section-content">
+                    {% for direction in recipe.direction_set.all %}
+                        <div class="direction-row">
+                            <h4 class="direction-step">{{ direction.step }}</h4>
+                            <div class="direction-text">{{ direction.description }}</div>
+                        </div>
+                    {% empty %}
+                        <li class="ingredient-item"> Keine Zutaten gefunden</li>
+                    {% endfor %}
 
-            {% for direction in recipe.direction_set.all %}
-                <div class="direction-row">
-                    <div class="direction-step">{{ direction.step }}</div>
-                    <div class="direction-text">{{ direction.description }}</div>
+                    {% if recipe.note %}
+                        <div class="recipe-notes">
+                            {{ recipe.note }}
+                        </div>
+                    {% endif %}
                 </div>
-            {% empty %}
-                <li class="ingredient-item"> Keine Zutaten gefunden</li>
-            {% endfor %}
-
-            {% if recipe.note %}
-                <div class="recipe-notes">
-                    {{ recipe.note }}
-                </div>
-            {% endif %}
         </section>
     </div>
 </div>

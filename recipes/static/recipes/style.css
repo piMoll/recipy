@@ -1,36 +1,45 @@
 @charset "UTF-8";
-body {
+html {
   font-family: sans-serif;
-  font-size: 18px;
+  font-size: 15px; }
+  @media screen and (min-width: 768px) {
+    html {
+      font-size: 16px; } }
+
+body {
   margin: 0;
   padding: 0; }
-  @media screen and (max-width: 768px) {
-    body {
-      font-size: 16px; } }
 
 .gutter {
   max-width: 900px;
   margin: auto;
   display: block;
-  padding-left: 5px;
-  padding-right: 5px; }
+  padding: 0 5px; }
   @media screen and (min-width: 900px) {
     .gutter {
-      padding-left: 0;
-      padding-right: 0; } }
+      padding: 0; } }
 
 .title {
-  margin: 20px auto 10px auto;
-  display: block;
-  font-size: 45px; }
+  font-size: 1.6rem;
+  margin: 0.8em auto 0.5em auto;
+  display: block; }
+  @media screen and (min-width: 768px) {
+    .title {
+      font-size: 2.8rem; } }
 
-.image img {
-  width: 900px;
-  max-height: 550px;
-  margin: 0 auto;
-  display: block;
-  object-fit: cover;
-  object-position: 50% 50%; }
+.image {
+  margin: 0 -5px; }
+  .image img {
+    width: 100%;
+    max-height: 320px;
+    display: block;
+    object-fit: cover;
+    object-position: 50% 50%; }
+  @media screen and (min-width: 768px) {
+    .image {
+      margin: 0; }
+      .image img {
+        max-height: 550px; } }
 
 .description {
   display: flex;
@@ -42,75 +51,116 @@ body {
 
 .tags {
   display: flex;
-  margin: 10px 0;
-  align-items: flex-start; }
+  margin: 0.5rem 0;
+  align-items: flex-start;
+  flex-wrap: wrap; }
 
 .tag {
   border: 2px solid transparent;
   border-radius: 5px;
   display: inline-block;
-  margin: 0 5px 9px 0;
-  padding: 3px 6px;
+  margin: 0 0.4em 0.6em 0;
+  padding: 0.2em 0.3em;
+  font-size: 1rem;
   font-weight: bold;
   text-decoration: none;
-  box-shadow: 3px 3px 2px #292929;
+  box-shadow: 2px 2px 2px #adadad;
   cursor: pointer; }
+  .tag.darkbg {
+    box-shadow: 2px 2px 2px #292929; }
 
 .recipe-times {
-  margin: 10px 0 15px 0;
-  display: flex; }
+  margin: 0.5rem 0;
+  display: flex;
+  line-height: 1.5rem;
+  flex-direction: column; }
+  @media screen and (min-width: 768px) {
+    .recipe-times {
+      flex-direction: row; } }
 
 .duration-type {
   display: flex;
-  margin-right: 50px; }
+  margin-right: 4rem; }
 
 .duration-title {
   font-weight: bold;
-  margin-right: 8px; }
+  margin-right: 0.4rem; }
 
 .section-title {
-  margin-bottom: 15px; }
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 0 solid lightgrey;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-top-right-radius: 3px;
+  width: 50%; }
+  @media screen and (min-width: 768px) {
+    .section-title {
+      font-size: 1.3rem;
+      border: none; } }
 
 .ingredients {
   display: block;
-  float: left;
-  width: 30%;
-  margin-top: 20px;
-  margin-right: 2%; }
+  margin-top: 1.4rem; }
+  @media screen and (min-width: 768px) {
+    .ingredients {
+      float: left;
+      width: 30%;
+      margin-right: 2%; } }
 
 .ingredient-list {
-  padding-left: 20px;
+  margin: 1rem 0;
+  padding-left: 1.2rem;
   list-style-type: none; }
 
 .ingredients-group {
-  margin: 20px 0 10px 0; }
+  margin: 1.2rem 0 0.8rem 0; }
 
 .ingredient-item {
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 30px;
-  padding-left: 15px;
-  text-indent: -15px; }
+  line-height: 2rem;
+  padding-left: 1.2rem;
+  text-indent: -1.2rem; }
 
 .ingredient-quantity {
   font-weight: bold; }
 
+.nutrition {
+  margin: 2rem 0 3rem 0;
+  font-style: italic;
+  font-size: 0.85rem; }
+
+.nutrition-title {
+  font-weight: normal;
+  margin: 0; }
+
+.nutrition-list {
+  margin-top: 0.5rem;
+  list-style-type: none;
+  padding-left: 1.2rem; }
+
 .directions {
   display: block;
-  float: left;
-  width: 66%;
-  margin-top: 20px; }
+  margin-top: 1.4rem; }
+  @media screen and (min-width: 768px) {
+    .directions {
+      float: left;
+      width: 66%; } }
 
 .direction-row {
   display: flex;
-  margin: 20px 0 20px 20px; }
+  margin: 1.2rem 0 1.2rem 1.2rem; }
 
 .direction-step {
-  font-size: 30px;
-  margin-right: 10px; }
+  line-height: 1;
+  font-size: 1.4rem;
+  font-weight: normal;
+  margin: 0 0.7rem 0 0; }
 
 .recipe-notes {
-  margin: 50px 0 20px 50px;
+  margin: 3rem 0 1rem 2.6rem;
   font-style: italic; }
 
 .recipe-list {
@@ -184,7 +234,8 @@ body {
     font-size: 12px;
     line-height: 12px;
     height: 14px;
-    margin-right: 1px; }
+    margin-right: 1px;
+    box-shadow: 2px 2px 2px #929292; }
 
 .page-header {
   background-color: #1a4854; }

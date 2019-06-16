@@ -7,6 +7,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .forms import RecipeCreateForm, IngredientForm, DirectionForm, IngredientOrderEnumerator, DirectionStepEnumerator
 from django.forms import inlineformset_factory, HiddenInput, TextInput
+from recipy import settings
 
 
 class RecipeDetailsView(DetailView):
@@ -173,8 +174,29 @@ def search(request):
                 query = query.exclude(tags=tag)
 
         search_string = request.GET.get('search_string')
-        if search_string is not None:
-            query = query.filter(title__icontains=search_string)
+        if search_string:
+
+            db_backend = settings.DATABASES['default']['ENGINE'].split('.')[-1]
+            if db_backend == 'postgresql':
+                from django.contrib.postgres.aggregates import StringAgg
+                from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+
+                searchV = SearchVector('title', weight='B') \
+                          + SearchVector(StringAgg('ingredient__name', delimiter=' '), weight='C') \
+                          + SearchVector(StringAgg('direction__description', delimiter=' '), weight='C')
+
+                terms = [SearchQuery(term+':*', search_type='raw') for term in search_string.split()]
+                searchQ = terms[0]
+                for sq in terms[1:]:
+                    searchQ &= sq
+
+                query = query.annotate(
+                    search=searchV,
+                    rank=SearchRank(searchV, searchQ)
+                    ).filter(search=searchQ).filter(rank__gt=0).order_by('-rank')
+
+            else:
+                query = query.filter(title__icontains=search_string)
 
             context.update(
                 search_string=search_string,
