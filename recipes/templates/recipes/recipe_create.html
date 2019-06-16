@@ -63,11 +63,20 @@ const directionsForm = `{{ direction_formset.empty_form }}`
 {% endblock %}
 
 
+{% block header-left %}
+<div class="header-button button-close">
+    <a href="{{ close_url }}"></a>
+</div>
+{% endblock %}
+
+
 {% block header-right %}
 <div class="header-button button-save">
     <input type="submit" form="create-recipe"/>
 </div>
-{{ block.super }}
+<div class="header-button button-import">
+    <a href="{% url 'crawler:index' %}"></a>
+</div>
 {% endblock %}
 
 

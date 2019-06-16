@@ -73,10 +73,12 @@ def create(request, pk=None):
     ingredient_formset = None
     direction_formset = None
     recipe = None
+    close_url = reverse('recipes:search')
 
     if pk is not None:
         recipe = get_object_or_404(Recipe, pk=pk)
-    
+        close_url = recipe.get_absolute_url()
+
     if request.method == "POST":
         recipe_form = RecipeCreateForm(data=request.POST, instance=recipe)
         if recipe_form.is_valid():
@@ -102,7 +104,8 @@ def create(request, pk=None):
         'recipe_form': recipe_form,
         'ingredient_formset': ingredient_formset,
         'direction_formset': direction_formset,
-        'tag_list': Tag.objects.all()
+        'tag_list': Tag.objects.all(),
+        'close_url': close_url
     })
 
 

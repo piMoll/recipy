@@ -25,7 +25,7 @@
         {% for tag, query, state in tag_list %}
             <a style="color:{{ tag.font }};background-color:{{ tag.color }};"
                href="?{{ query }}"
-               class="tag darkbg {% if state == 'y' %} include-tag {% elif state == 'n' %} exclude-tag {% endif %}">
+               class="tag{% if state == 'y' %} include-tag{% elif state == 'n' %} exclude-tag{% endif %}">
                 {{ tag.name }}
             </a>
         {% endfor %}

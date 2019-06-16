@@ -85,12 +85,8 @@ $page-gutter-width: 900px;
     font-size: 1rem;
     font-weight: bold;
     text-decoration: none;
-    box-shadow: 2px 2px 2px #adadad;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
     cursor: pointer;
-
-    &.darkbg {
-        box-shadow: 2px 2px 2px #292929;
-    }
 }
 
 .recipe-times {
@@ -401,6 +397,12 @@ $header-font: white;
 
 .button-edit a:after {
     background-image: url("edit_" + $header-font + ".png");
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+}
+
+.button-close a:after {
+    background-image: url("close_" + $header-font + ".png");
     background-repeat: no-repeat;
     background-size: 32px 32px;
 }
