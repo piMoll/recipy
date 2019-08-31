@@ -106,18 +106,43 @@ body {
     margin-top: 0; } }
 
 .section-title {
-  font-size: 1.1rem;
   margin-bottom: 1rem;
   padding: 0.5rem 0.5rem 0.5rem 0;
-  border: 0 solid lightgrey;
-  border-top-width: 1px;
-  border-right-width: 1px;
-  border-top-right-radius: 3px;
-  width: 50%; }
-  @media print, (min-width: 768px) {
-    .section-title {
-      font-size: 1.3rem;
-      border: none; } }
+  font-size: 1.3rem; }
+  @media screen and (max-width: 767px) {
+    .section-title.desktop {
+      display: none; } }
+  .section-title.mobile {
+    background: none;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+    width: 50%;
+    color: darkgrey;
+    font-weight: normal;
+    text-align: center;
+    border: 0 solid lightgrey;
+    border-bottom-width: 1px;
+    cursor: pointer;
+    outline: 0; }
+    .section-title.mobile.active {
+      color: black;
+      font-weight: bold;
+      border-bottom-width: 0;
+      border-top-width: 1px;
+      border-top-right-radius: 3px; }
+    @media print, (min-width: 768px) {
+      .section-title.mobile {
+        display: none; } }
+
+.mobile-tabs {
+  display: flex; }
+  .mobile-tabs :first-child {
+    border-right-width: 1px; }
+
+@media screen and (max-width: 767px) {
+  .section-content.inactive {
+    display: none; } }
 
 .ingredients {
   display: block;
