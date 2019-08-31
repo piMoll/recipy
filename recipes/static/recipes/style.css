@@ -306,6 +306,8 @@ body {
 
 .search {
   padding-bottom: 16px; }
+  .search h1 {
+    color: #f7f7ee; }
 
 .search form {
   position: relative;

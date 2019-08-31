@@ -1,3 +1,7 @@
+
+$color-solarized-bright: #f7f7ee;
+
+
 html {
     font-family: sans-serif;
     font-size: 15px;
@@ -269,7 +273,7 @@ $recipe-list-margin: 4px;
 }
 
 .recipe-list-item {
-    background-color: #f7f7ee;
+    background-color: $color-solarized-bright;
     margin: 0 $recipe-list-margin 2*$recipe-list-margin;
 
     box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.3);
@@ -426,6 +430,9 @@ $header-font: white;
 
 .search {
     padding-bottom: 16px;
+    h1 {
+        color: $color-solarized-bright;
+    }
 }
 
 .search form {
