@@ -293,6 +293,11 @@ body {
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
+.button-share a:after {
+  background-image: url("share_white.png");
+  background-repeat: no-repeat;
+  background-size: 32px 32px; }
+
 .button-save input {
   padding: 0;
   border: 0;
@@ -407,12 +412,26 @@ body {
     left: 14px;
     padding: 0 3px;
     transition: none; }
-    body.ready .md-text-input label {
-      transition: top 10ms linear, left 10ms linear; }
   .md-text-input input.blank:not(:focus) + label, .md-text-input textarea.blank:not(:focus) + label {
     font-size: 1em;
     top: 11px;
     opacity: 0.6; }
+
+.create-image {
+  margin-bottom: 0.6rem;
+  text-align: center;
+  position: relative; }
+  .create-image label {
+    border: 1px solid black;
+    border-radius: 0.3em;
+    padding: 10px 16px;
+    background: white;
+    display: block; }
+  .create-image img + label {
+    display: inline;
+    position: absolute;
+    top: 10px;
+    left: 10px; }
 
 .create-tag ul {
   list-style: none;

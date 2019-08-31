@@ -74,7 +74,7 @@ class Recipe(models.Model):
         blank=True,
         default=''
     )
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, blank=True)
     creationdate = models.DateField()
     public_slug = models.CharField(max_length=10, unique=True, null=False)
     
@@ -140,6 +140,11 @@ class Picture(models.Model):
         self.image.name = self.get_file()
 
         super(Picture, self).save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        # todo: actually delete file
+        self.image.delete(save=False)
+        super().delete(using=using, keep_parents=keep_parents)
 
     def get_file(self):
         recipe_id = f'{self.recipe_id:04d}'

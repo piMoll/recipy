@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import CheckboxSelectMultiple, BaseInlineFormSet
+from django.forms import CheckboxSelectMultiple, BaseInlineFormSet, inlineformset_factory, TextInput, HiddenInput, ImageField
 
 from .models import Recipe, Ingredient, Direction, Picture, Tag
 
@@ -16,10 +16,14 @@ class TagSelectWidget(CheckboxSelectMultiple):
 
 
 class RecipeCreateForm(forms.ModelForm):
+    # tags = forms.ModelChoiceField(queryset=Tag.objects.all(), required=False)
+    picture = ImageField(required=False)
+
     class Meta:
         model = Recipe
-        fields = [
+        fields = (
             'title',
+            'picture',
             'preparationtime',
             'cooktime',
             'resttime',
@@ -31,10 +35,8 @@ class RecipeCreateForm(forms.ModelForm):
             'nutrition_protein',
             'tags',
             'source',
-            # 'ingredients',
-            # 'directions',
             'note',
-        ]
+        )
         widgets = {
             'tags': TagSelectWidget
         }
@@ -42,10 +44,6 @@ class RecipeCreateForm(forms.ModelForm):
 
 class IngredientForm(forms.ModelForm):
     order_item = forms.IntegerField(required=False)
-
-
-class DirectionForm(forms.ModelForm):
-    step = forms.IntegerField(required=False)
 
 
 class IngredientOrderEnumerator(BaseInlineFormSet):
@@ -65,6 +63,31 @@ class IngredientOrderEnumerator(BaseInlineFormSet):
                 instance.order_item = i
 
 
+IngredientFormSet = inlineformset_factory(
+    Recipe, Ingredient,
+    fields=(
+        'quantity',
+        'name',
+        'group',
+        'order_item',
+    ),
+    extra=15,
+    formset=IngredientOrderEnumerator,
+    widgets={
+        'quantity': TextInput(),
+        'name': TextInput(),
+        'order_item': HiddenInput(),
+        'group': HiddenInput(),
+        'DELETE': HiddenInput(),
+    },
+    form=IngredientForm,
+)
+
+
+class DirectionForm(forms.ModelForm):
+    step = forms.IntegerField(required=False)
+
+
 class DirectionStepEnumerator(BaseInlineFormSet):
     def clean(self):
         super().clean()
@@ -74,3 +97,21 @@ class DirectionStepEnumerator(BaseInlineFormSet):
                 continue
             i += 1
             form.instance.step = i
+
+
+DirectionFormSet = inlineformset_factory(
+    Recipe, Direction,
+    fields=(
+        'step',
+        'description',
+    ),
+    extra=7,
+    labels={
+        'description': 'Schritt'
+    },
+    widgets={
+        'step': HiddenInput(),
+    },
+    formset=DirectionStepEnumerator,
+    form=DirectionForm,
+)

@@ -82,15 +82,28 @@ const directionsForm = `{{ direction_formset.empty_form }}`
 
 {% block content %}
 <div class="gutter">
-    <form method="post" id="create-recipe">
+    <form method="post" id="create-recipe" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in recipe_form.hidden_fields %}
             {{ field }}
         {% endfor %}
+
         {{ ingredient_formset.management_form }}
         {{ direction_formset.management_form }}
 
         <div class="create-form md-form">
+            <div class="image create-image">
+                {% if recipe_form.instance and recipe_form.instance.picture_set.get %}
+                <img src="{{ recipe_form.instance.picture_set.get.image.url }}" alt="The finished recipe">
+                {% endif %}
+
+                <label for="{{ recipe_form.picture.id_for_label }}">Set Picture</label>
+
+                <div style="display:none;">
+                    {{ recipe_form.picture }}
+                </div>
+            </div>
+
             <div class="create-title md-text-input md-lg">
                 {{ recipe_form.title }}
                 <label for="{{ recipe_form.title.id_for_label }}">{{ recipe_form.title.label }}</label>
@@ -206,6 +219,7 @@ const directionsForm = `{{ direction_formset.empty_form }}`
             </div>
         </div>
     </form>
+{{ recipe_form.errors }}
 {{ ingredient_formset.errors }}
 </div>
 {% endblock %}

@@ -1,12 +1,12 @@
+from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .models import Tag, Recipe, Ingredient, Direction
+from .models import Tag, Recipe, Picture
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import FormView
-from .forms import RecipeCreateForm, IngredientForm, DirectionForm, IngredientOrderEnumerator, DirectionStepEnumerator
-from django.forms import inlineformset_factory, HiddenInput, TextInput
+# from django.views.generic.edit import FormView
+from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet
 from recipy import settings
 
 
@@ -14,62 +14,12 @@ class RecipeDetailsView(DetailView):
     model = Recipe
     context_object_name = 'recipe'
 
+
 class RecipeDetailsPublicView(DetailView):
     model = Recipe
     slug_field = 'public_slug'
     context_object_name = 'recipe'
-
-IngredientFormSet = inlineformset_factory(
-    Recipe, Ingredient,
-    fields=(
-        'quantity',
-        'name',
-        'group',
-        'order_item',
-    ),
-    extra=15,
-    formset=IngredientOrderEnumerator,
-    widgets={
-        'quantity': TextInput(),
-        'name': TextInput(),
-        'order_item': HiddenInput(),
-        'group': HiddenInput(),
-        'DELETE': HiddenInput(),
-    },
-    form=IngredientForm,
-)
-
-DirectionFormSet = inlineformset_factory(
-    Recipe, Direction,
-    fields=(
-        'step',
-        'description',
-    ),
-    extra=7,
-    labels={
-        'description': 'Schritt'
-    },
-    widgets={
-        'step': HiddenInput(),
-    },
-    formset=DirectionStepEnumerator,
-    form=DirectionForm,
-)
-
-
-class RecipeCreate(FormView):
-    form_class = RecipeCreateForm
-    template_name = 'recipes/recipe_create.html'
-    success_url = '.'
-
-    def form_valid(self, form):
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        return {
-            'formset': inlineformset_factory(Recipe, Ingredient, fields=(
-                'quantity', 'name'))
-        }
+    template_name_suffix = '_public'
 
 
 def create(request, pk=None):
@@ -84,20 +34,49 @@ def create(request, pk=None):
         close_url = recipe.get_absolute_url()
 
     if request.method == "POST":
-        recipe_form = RecipeCreateForm(data=request.POST, instance=recipe)
-        if recipe_form.is_valid():
-            recipe = recipe_form.save()
+        # recipe_form.save() must be called before initializing IngredientFormSet and DirectionFormSet, so we can set
+        # the instance properly. Additionally, both FormSets must be initialized so we can keep the entered data in
+        # case of an error. However, if there is an error somewhere, we need to rollback the recipe_form.save().
+        try:
+            with transaction.atomic():
+                no_errors = True
 
-            ingredient_formset = IngredientFormSet(data=request.POST, instance=recipe)
-            if ingredient_formset.is_valid():
-                ingredients = ingredient_formset.save()
+                recipe_form = RecipeCreateForm(data=request.POST, files=request.FILES, instance=recipe)
+                no_errors = no_errors and recipe_form.is_valid()
+                if no_errors:
+                    recipe = recipe_form.save()
 
-            direction_formset = DirectionFormSet(data=request.POST, instance=recipe)
-            if direction_formset.is_valid():
-                directions = direction_formset.save()
+                    image = recipe_form.cleaned_data['picture']
+                    if image:
+                        # todo: add picture instead of replace
+                        if recipe.picture_set:
+                            recipe.picture_set.get().delete()
 
-            if ingredient_formset.is_valid() and direction_formset.is_valid():
-                return HttpResponseRedirect(reverse('recipes:detail', kwargs={'pk': recipe.pk}))
+                        new_picture = Picture(
+                            recipe=recipe,
+                            image=image,
+                            order=0,
+                            description=''
+                        )
+                        new_picture.save()
+
+                ingredient_formset = IngredientFormSet(data=request.POST, instance=recipe)
+                no_errors = no_errors and ingredient_formset.is_valid()
+                if no_errors:
+                    ingredient_formset.save()
+
+                direction_formset = DirectionFormSet(data=request.POST, instance=recipe)
+                no_errors = no_errors and direction_formset.is_valid()
+                if no_errors:
+                    direction_formset.save()
+
+                if no_errors:
+                    return HttpResponseRedirect(reverse('recipes:detail', kwargs={'pk': recipe.pk}))
+                else:
+                    raise RuntimeError()
+
+        except RuntimeError:
+            pass  # we just need to break the __open__()
 
     elif request.method == 'GET':
         recipe_form = RecipeCreateForm(instance=recipe)
@@ -162,7 +141,8 @@ def search(request):
             reset_tags=reset_tags
         )
 
-        random_sample = Recipe.objects.order_by('?')[:6]
+        random_sample_count = 6
+        random_sample = Recipe.objects.order_by('?')[:random_sample_count]
 
         query = Recipe.objects.all().distinct()
         query_ = query
@@ -188,19 +168,19 @@ def search(request):
                 from django.contrib.postgres.aggregates import StringAgg
                 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
-                searchV = SearchVector('title', weight='B') \
-                          + SearchVector(StringAgg('ingredient__name', delimiter=' '), weight='C') \
-                          + SearchVector(StringAgg('direction__description', delimiter=' '), weight='C')
+                search_v = SearchVector('title', weight='B') \
+                    + SearchVector(StringAgg('ingredient__name', delimiter=' '), weight='C') \
+                    + SearchVector(StringAgg('direction__description', delimiter=' '), weight='C')
 
-                terms = [SearchQuery(term+':*', search_type='raw') for term in search_string.split()]
-                searchQ = terms[0]
+                terms = [SearchQuery(term + ':*', search_type='raw') for term in search_string.split()]
+                search_q = terms[0]
                 for sq in terms[1:]:
-                    searchQ &= sq
+                    search_q &= sq
 
                 query = query.annotate(
-                    search=searchV,
-                    rank=SearchRank(searchV, searchQ)
-                    ).filter(search=searchQ).filter(rank__gt=0).order_by('-rank')
+                    search=search_v,
+                    rank=SearchRank(search_v, search_q)
+                ).filter(search=search_q).filter(rank__gt=0).order_by('-rank')
 
             else:
                 query = query.filter(title__icontains=search_string)

@@ -6,8 +6,11 @@
 
 
 {% block header-right %}
+<div class="header-button button-share">
+    <a href="{% url 'recipes:public' slug=recipe.public_slug %}"></a>
+</div>
 <div class="header-button button-edit">
-    <a href="{% url 'recipes:edit' pk=recipe.pk%}"></a>
+    <a href="{% url 'recipes:edit' pk=recipe.pk %}"></a>
 </div>
 {{ block.super }}
 {% endblock %}
@@ -98,7 +101,9 @@
                             <div class="direction-text">{{ direction.description }}</div>
                         </div>
                     {% empty %}
-                        <li class="ingredient-item"> Keine Zutaten gefunden</li>
+                        <div class="direction-row">
+                            Keine Zubereitungsschritte gefunden
+                        </div>
                     {% endfor %}
 
                     {% if recipe.note %}

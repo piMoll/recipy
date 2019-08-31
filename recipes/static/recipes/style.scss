@@ -411,6 +411,12 @@ $header-font: white;
     background-size: 32px 32px;
 }
 
+.button-share a:after {
+    background-image: url("share_" + $header-font + ".png");
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+}
+
 .button-save {
     input {
         padding: 0;
@@ -565,10 +571,6 @@ $md-text-input-padding: 10px;
         left: $padding-left + 1 - $label-padding;
         padding: 0 $label-padding;
         transition: none;
-
-        body.ready & {
-            transition: top 10ms linear, left 10ms linear;
-        }
     }
 
     // todo: wait for :blank to be implemented
@@ -580,6 +582,28 @@ $md-text-input-padding: 10px;
 
             opacity: 0.6;
         }
+    }
+}
+
+.create-image {
+    margin-bottom: $md-text-input-spacing;
+    text-align: center;
+    position: relative;
+
+    label {
+        border: 1px solid black;
+        border-radius: 0.3em;
+        padding: 10px 16px;
+        background: white;
+
+        display: block;
+    }
+
+    img + label {
+        display: inline;
+        position: absolute;
+        top: 10px;
+        left: 10px;
     }
 }
 
