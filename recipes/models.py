@@ -5,6 +5,11 @@ from django.urls import reverse
 from django.utils import timezone
 
 
+def get_slug(length):
+    return '{slug:0{length}x}'.format(length=length,
+                                      slug=random.randrange(16 ** length))
+
+
 class Tag(models.Model):
     BRIGHT = 'rgb(253, 246, 227)'
     DARK = 'rgb(0, 43, 54)'
@@ -71,18 +76,27 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(Tag)
     creationdate = models.DateField()
+    public_slug = models.CharField(max_length=10, unique=True, null=False)
     
     def __str__(self):
         return self.title
 
     def save(self, *args, **kwargs):
-        """ Set creation date """
+        """ Set creation date and slug """
         if not self.id:
             self.creationdate = timezone.now()
+            # Public link
+            self.public_slug = get_slug(10)
+            while Recipe.objects.filter(public_slug=self.public_slug).exists():
+                self.public_slug = get_slug(10)
+
         return super(Recipe, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('recipes:detail', kwargs={'pk': self.pk})
+    
+    def get_public_url(self):
+        return reverse('recipes:public', kwargs={'public_slug': self.public_slug})
 
 
 class Ingredient(models.Model):
@@ -128,7 +142,26 @@ class Picture(models.Model):
         super(Picture, self).save(*args, **kwargs)
 
     def get_file(self):
-        recipe_id = '{:04d}'.format(self.recipe_id)
-        random_slug = '{:08x}'.format(random.randrange(16 ** 8))
+        recipe_id = f'{self.recipe_id:04d}'
+        random_slug = get_slug(8)
         extension = self.image.file.content_type.split('/')[1]
         return f'{recipe_id}_{random_slug}.{extension}'
+
+
+class Collection(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    recipes = models.ManyToManyField(Recipe)
+    public_slug = models.CharField(max_length=10, unique=True, null=False)
+
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        """ Set slug """
+        if not self.id:
+            # Public link
+            self.public_slug = get_slug(10)
+            while Collection.objects.filter(public_slug=self.public_slug).exists():
+                self.public_slug = get_slug(10)
+
+        return super(Collection, self).save(*args, **kwargs)
