@@ -14,6 +14,10 @@ class RecipeDetailsView(DetailView):
     model = Recipe
     context_object_name = 'recipe'
 
+class RecipeDetailsPublicView(DetailView):
+    model = Recipe
+    slug_field = 'public_slug'
+    context_object_name = 'recipe'
 
 IngredientFormSet = inlineformset_factory(
     Recipe, Ingredient,
