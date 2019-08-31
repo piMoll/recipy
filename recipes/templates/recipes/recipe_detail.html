@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block js-foot %}
+{{ block.super }}
+<script src="{% static 'recipes/script/mobile-tabs.js' %}" type="text/javascript"></script>
+{% endblock %}
 
 {% block title %}Rezept: {{ recipe.title }}{% endblock %}
 
@@ -52,9 +56,15 @@
     </div>
 
     <div class="recipe-details">
+
+        <div class="mobile-tabs">
+            <button class="section-title mobile" id="ingredients-title">Zutaten</button>
+            <button class="section-title mobile" id="directions-title">Zubereitung</button>
+        </div>
+
         <section class="ingredients">
-            <h3 class="section-title">Zutaten</h3>
-                <div class="section-content">
+            <h3 class="section-title desktop">Zutaten</h3>
+                <div class="section-content" id="ingredients-content">
                     {% if recipe.portion_unit %}
                     <div class="ingredient-portion">
                         <div>ergibt {{ recipe.portion_quantity|floatformat }} {{ recipe.get_portion_unit_display }}</div>
@@ -93,8 +103,8 @@
         </section>
 
         <section class="directions">
-            <h3 class="section-title">Zubereitung</h3>
-                <div class="section-content">
+            <h3 class="section-title desktop">Zubereitung</h3>
+                <div class="section-content" id="directions-content">
                     {% for direction in recipe.direction_set.all %}
                         <div class="direction-row">
                             <h4 class="direction-step">{{ direction.step }}</h4>

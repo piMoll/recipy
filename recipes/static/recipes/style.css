@@ -2,9 +2,12 @@
 html {
   font-family: sans-serif;
   font-size: 15px; }
-  @media screen and (min-width: 768px) {
+  @media (min-width: 768px) {
     html {
       font-size: 16px; } }
+  @media print {
+    html {
+      font-size: 13px; } }
 
 body {
   margin: 0;
@@ -15,7 +18,7 @@ body {
   margin: auto;
   display: block;
   padding: 0 5px; }
-  @media screen and (min-width: 900px) {
+  @media print, (min-width: 900px) {
     .gutter {
       padding: 0; } }
 
@@ -23,9 +26,13 @@ body {
   font-size: 1.6rem;
   margin: 0.8em auto 0.5em auto;
   display: block; }
-  @media screen and (min-width: 768px) {
+  @media (min-width: 768px) {
     .title {
       font-size: 2.8rem; } }
+  @media print {
+    .title {
+      font-size: 2.8rem;
+      margin: 0.2em 0 0 0; } }
 
 .image {
   margin: 0 -5px; }
@@ -35,11 +42,14 @@ body {
     display: block;
     object-fit: cover;
     object-position: 50% 50%; }
-  @media screen and (min-width: 768px) {
+  @media (min-width: 768px) {
     .image {
       margin: 0; }
       .image img {
         max-height: 550px; } }
+  @media print {
+    .image {
+      display: none; } }
 
 .description {
   display: flex;
@@ -48,6 +58,10 @@ body {
   padding-bottom: 15px;
   border-bottom-width: 8px;
   border-radius: 8px; }
+  @media print {
+    .description {
+      border-width: 0;
+      padding-bottom: 0; } }
 
 .tags {
   display: flex;
@@ -66,46 +80,78 @@ body {
   text-decoration: none;
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
   cursor: pointer; }
+  @media print {
+    .tag {
+      display: none; } }
 
 .recipe-times {
   margin: 0.5rem 0;
   display: flex;
   line-height: 1.5rem;
   flex-direction: column; }
-  @media screen and (min-width: 768px) {
+  @media print, (min-width: 768px) {
     .recipe-times {
       flex-direction: row; } }
 
 .duration-type {
   display: flex;
-  margin-right: 4rem; }
+  margin-right: 3rem; }
 
 .duration-title {
   font-weight: bold;
   margin-right: 0.4rem; }
 
+@media print {
+  .recipe-details section {
+    margin-top: 0; } }
+
 .section-title {
-  font-size: 1.1rem;
   margin-bottom: 1rem;
-  padding: 0.5rem;
-  border: 0 solid lightgrey;
-  border-top-width: 1px;
-  border-right-width: 1px;
-  border-top-right-radius: 3px;
-  width: 50%; }
-  @media screen and (min-width: 768px) {
-    .section-title {
-      font-size: 1.3rem;
-      border: none; } }
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  font-size: 1.3rem; }
+  @media screen and (max-width: 767px) {
+    .section-title.desktop {
+      display: none; } }
+  .section-title.mobile {
+    background: none;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+    width: 50%;
+    color: darkgrey;
+    font-weight: normal;
+    text-align: center;
+    border: 0 solid lightgrey;
+    border-bottom-width: 1px;
+    cursor: pointer;
+    outline: 0; }
+    .section-title.mobile.active {
+      color: black;
+      font-weight: bold;
+      border-bottom-width: 0;
+      border-top-width: 1px;
+      border-top-right-radius: 3px; }
+    @media print, (min-width: 768px) {
+      .section-title.mobile {
+        display: none; } }
+
+.mobile-tabs {
+  display: flex; }
+  .mobile-tabs :first-child {
+    border-right-width: 1px; }
+
+@media screen and (max-width: 767px) {
+  .section-content.inactive {
+    display: none; } }
 
 .ingredients {
   display: block;
   margin-top: 1.4rem; }
-  @media screen and (min-width: 768px) {
+  @media print, (min-width: 768px) {
     .ingredients {
       float: left;
-      width: 30%;
-      margin-right: 2%; } }
+      width: 33%;
+      margin-right: 3%; } }
 
 .ingredient-list {
   margin: 1rem 0;
@@ -116,11 +162,12 @@ body {
   margin: 1.2rem 0 0.8rem 0; }
 
 .ingredient-item {
-  overflow: hidden;
-  text-overflow: ellipsis;
   line-height: 2rem;
   padding-left: 1.2rem;
   text-indent: -1.2rem; }
+  @media print {
+    .ingredient-item {
+      line-height: 1.3rem; } }
 
 .ingredient-quantity {
   font-weight: bold; }
@@ -142,14 +189,14 @@ body {
 .directions {
   display: block;
   margin-top: 1.4rem; }
-  @media screen and (min-width: 768px) {
+  @media print, (min-width: 768px) {
     .directions {
       float: left;
-      width: 66%; } }
+      width: 64%; } }
 
 .direction-row {
   display: flex;
-  margin: 1.2rem 0 1.2rem 1.2rem; }
+  margin: 1.2rem 0; }
 
 .direction-step {
   line-height: 1;
@@ -158,8 +205,11 @@ body {
   margin: 0 0.7rem 0 0; }
 
 .recipe-notes {
-  margin: 3rem 0 1rem 2.6rem;
+  margin: 3rem 0 1rem 1.5rem;
   font-style: italic; }
+  @media print {
+    .recipe-notes {
+      margin-top: 2rem; } }
 
 .recipe-list {
   overflow: hidden; }
@@ -239,6 +289,9 @@ body {
   background-color: #1a4854; }
   .page-header, .page-header a {
     color: white; }
+  @media print {
+    .page-header {
+      display: none; } }
 
 .header-nav {
   display: flex;
