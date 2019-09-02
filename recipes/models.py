@@ -142,7 +142,6 @@ class Picture(models.Model):
         super(Picture, self).save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
-        # todo: actually delete file
         self.image.delete(save=False)
         super().delete(using=using, keep_parents=keep_parents)
 
