@@ -2,15 +2,16 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.detail import DetailView
 
 from .models import Tag, Recipe, Picture
-from django.views.generic.detail import DetailView
-# from django.views.generic.edit import FormView
 from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet
 from recipy import settings
 
 
-class RecipeDetailsView(DetailView):
+class RecipeDetailsView(LoginRequiredMixin, DetailView):
     model = Recipe
     context_object_name = 'recipe'
 
@@ -22,6 +23,7 @@ class RecipeDetailsPublicView(DetailView):
     template_name_suffix = '_public'
 
 
+@login_required
 def create(request, pk=None):
     recipe_form = None
     ingredient_formset = None
@@ -130,7 +132,7 @@ def get_next_tag_states(request):
 
     return result, reset_tags
 
-
+@login_required
 def search(request):
     context = {}
 
