@@ -1,11 +1,12 @@
 from django import forms
 from django.views.generic import FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .adapters import available_options
 import json
 
 
-class ImportForm(forms.Form):
+class ImportForm(LoginRequiredMixin, forms.Form):
     adapter = forms.TypedChoiceField(
         choices=[(key, val['name']) for key, val in available_options.items()],
         coerce=lambda key: available_options[key]['handler']
@@ -13,7 +14,7 @@ class ImportForm(forms.Form):
     titles = forms.CharField(widget=forms.Textarea({"cols": 80, "rows": 10}))
 
 
-class ImportView(FormView):
+class ImportView(LoginRequiredMixin, FormView):
     template_name = 'crawler/index.html'
     form_class = ImportForm
 

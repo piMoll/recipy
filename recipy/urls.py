@@ -24,6 +24,7 @@ urlpatterns = [
     path('import/', include('crawler.urls')),
     path('admin/', admin.site.urls),
     path('', views.StartPage.as_view(), name='start'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
