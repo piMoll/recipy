@@ -1,0 +1,53 @@
+body {
+  font-family: sans-serif;
+  font-size: 14px; }
+  @media (min-width: 768px) {
+    body {
+      font-size: 16px; } }
+
+.registration-container {
+  background: #f7f7ee;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 26em;
+  margin: 100px auto;
+  position: relative;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 2px 5px -1px rgba(0, 0, 0, 0.3); }
+  .registration-container div:first-child {
+    margin-top: 1rem; }
+  .registration-container .first-row {
+    margin-bottom: 1rem; }
+  .registration-container .login-row {
+    align-items: center;
+    display: flex;
+    margin-bottom: 1rem; }
+    .registration-container .login-row .login-label {
+      min-width: 100px;
+      margin-right: 1rem; }
+    .registration-container .login-row .login-field {
+      flex-grow: 1; }
+      .registration-container .login-row .login-field input {
+        width: 100%;
+        box-sizing: border-box; }
+  .registration-container .login-submit {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem; }
+    .registration-container .login-submit input {
+      background-color: #1a4854;
+      border: 2px solid white;
+      padding: 0.7rem 1.5rem;
+      border-radius: 4px;
+      color: white;
+      box-shadow: 2px 2px 5px -1px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
+      cursor: pointer; }
+  .registration-container .logged-out {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem; }
