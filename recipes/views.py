@@ -50,7 +50,7 @@ def create(request, pk=None):
                     image = recipe_form.cleaned_data['picture']
                     if image:
                         # todo: add picture instead of replace
-                        if recipe.picture_set:
+                        if recipe.picture_set.exists():
                             recipe.picture_set.get().delete()
 
                         new_picture = Picture(
