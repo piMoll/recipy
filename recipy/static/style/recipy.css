@@ -365,7 +365,7 @@ body {
   height: 100%;
   cursor: pointer;
   background-color: transparent;
-  background-image: url("save_white.png");
+  background-image: url("../images/save_white.png");
   background-position: 20px 20px;
   background-repeat: no-repeat;
   background-size: 32px 32px; }
