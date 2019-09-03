@@ -495,7 +495,7 @@ $header-font: white;
         height: 100%;
         cursor: pointer;
         background-color: transparent;
-        background-image: url("save_" + $header-font + ".png");
+        background-image: url("../images/save_" + $header-font + ".png");
         background-position: 20px 20px;
         background-repeat: no-repeat;
         background-size: 32px 32px;
