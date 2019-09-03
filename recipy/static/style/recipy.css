@@ -322,37 +322,37 @@ body {
       left: 20px; }
 
 .button-home a:after {
-  background-image: url("home_white.png");
+  background-image: url("../images/home_white.png");
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
 .button-import a:after {
-  background-image: url("crawler_white.png");
+  background-image: url("../images/crawler_white.png");
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
 .button-create a:after {
-  background-image: url("create_white.png");
+  background-image: url("../images/create_white.png");
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
 .button-edit a:after {
-  background-image: url("edit_white.png");
+  background-image: url("../images/edit_white.png");
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
 .button-close a:after {
-  background-image: url("close_white.png");
+  background-image: url("../images/close_white.png");
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
 .button-share a:after {
-  background-image: url("share_white.png");
+  background-image: url("../images/share_white.png");
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
 .button-logout a:after {
-  background-image: url("logout_white.png");
+  background-image: url("../images/logout_white.png");
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
@@ -398,7 +398,7 @@ body {
   display: block;
   width: 30px;
   height: 30px;
-  background: url("search_black.png") no-repeat 8px 8px;
+  background: url("../images/search_black.png") no-repeat 8px 8px;
   background-size: 30px 30px;
   font-size: 0;
   box-sizing: content-box; }
@@ -571,7 +571,7 @@ body {
     display: block;
     height: 100%;
     width: 100%;
-    background-image: url("delete_black.png");
+    background-image: url("../images/delete_black.png");
     background-size: 70% 70%;
     background-position: 30% 30%;
     background-repeat: no-repeat;
