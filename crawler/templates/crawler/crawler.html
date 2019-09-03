@@ -1,0 +1,14 @@
+<form method="post" class="crawler-form">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <input type="submit" value="Importieren">
+</form>
+{% if import_result %}
+<div class="crawler-response">
+    <pre>
+        <code>
+{{ import_result }}
+        </code>
+    </pre>
+</div>
+{% endif %}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {% load static %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=yes, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>{% block title %}Recipy{% endblock %}</title>
+
+    {% block styles %}
+        <link rel="stylesheet" type="text/css" href="{% static 'recipes/style.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'registration/style.css' %}">
+    {% endblock %}
+
+    {% block js-head %}{% endblock %}
+</head>
+<body>
+
+{% block header %}
+    {% if user.is_authenticated %}
+    <div class="page-header">
+        <div class="header-nav">
+            <div class="header-buttons-left">
+                {% block header-left %}
+                    <div class="header-button button-home">
+                        <a href="/"></a>
+                    </div>
+                    <div class="header-button button-logout">
+                        <a href="{% url 'logout' %}"></a>
+                    </div>
+                {% endblock %}
+            </div>
+            <div class="header-buttons-right">
+                {% block header-right %}
+                    <div class="header-button button-create">
+                        <a href="{% url 'recipes:create' %}"></a>
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+        {% block header-after %}{% endblock %}
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block js-foot %}{% endblock %}
+<script type="text/javascript">document.body.classList.add('ready')</script>
+
+</body>
+</html>

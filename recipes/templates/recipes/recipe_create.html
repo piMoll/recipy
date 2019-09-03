@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block js-foot %}
+{{ block.super }}
+
+
+<script type="text/html" id="template-ingredient-group">
+    <div class="ingredient-group">
+        <div class="md-text-input ingredient-group-name">
+            <input id="group-input-__GROUPKEY__" class="ingredient-group-input" type="text" value="">
+            <label for="group-input-__GROUPKEY__">Zwischenschritt</label>
+        </div>
+
+        {{ ingredient_formset.empty_form.DELETE }}
+        <div class="create-ingredient flex-row">
+            <div class="ingredient-delete">
+                <label for="{{ ingredient_formset.empty_form.DELETE.id_for_label }}">{{ ingredient_formset.empty_form.DELETE.label }}</label>
+            </div>
+
+            <div class="md-text-input flex-40">
+                {{ ingredient_formset.empty_form.quantity }}
+                <label for="{{ ingredient_formset.empty_form.quantity.id_for_label }}">{{ ingredient_formset.empty_form.quantity.label }}</label>
+            </div>
+            <div class="md-text-input flex-60">
+                {{ ingredient_formset.empty_form.name }}
+                <label for="{{ ingredient_formset.empty_form.name.id_for_label }}">{{ ingredient_formset.empty_form.name.label }}</label>
+            </div>
+
+            {% for field in ingredient_formset.empty_form.hidden_fields %}
+                {{ field }}
+            {% endfor %}
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="template-direction-form">
+    {{ direction_formset.empty_form.DELETE }}
+
+    <div class="create-direction">
+        <div class="direction-delete">
+            <label for="{{ direction_formset.empty_form.DELETE.id_for_label }}">{{ direction_formset.empty_form.DELETE.label }}</label>
+        </div>
+
+        <div class="md-text-input flex-40">
+            {{ direction_formset.empty_form.description }}
+            <label for="{{ direction_formset.empty_form.description.id_for_label }}">{{ direction_formset.empty_form.description.label }}</label>
+        </div>
+
+        {% for field in direction_formset.empty_form.hidden_fields %}
+            {{ field }}
+        {% endfor %}
+    </div>
+</script>
+
+<script type="text/javascript">
+const directionsForm = `{{ direction_formset.empty_form }}`
+</script>
+
+<script src="{% static 'recipes/script/create.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+
+{% block header-left %}
+<div class="header-button button-close">
+    <a href="{{ close_url }}"></a>
+</div>
+{% endblock %}
+
+
+{% block header-right %}
+<div class="header-button button-save">
+    <input type="submit" form="create-recipe"/>
+</div>
+<div class="header-button button-import">
+    <a href="{% url 'crawler:index' %}"></a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="gutter">
+    <form method="post" id="create-recipe" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in recipe_form.hidden_fields %}
+            {{ field }}
+        {% endfor %}
+
+        {{ ingredient_formset.management_form }}
+        {{ direction_formset.management_form }}
+
+        <div class="create-form md-form">
+            <div class="image create-image">
+                {% if recipe_form.instance and recipe_form.instance.picture_set.get %}
+                <img src="{{ recipe_form.instance.picture_set.get.image.url }}" alt="The finished recipe">
+                {% endif %}
+
+                <label for="{{ recipe_form.picture.id_for_label }}">Set Picture</label>
+
+                <div style="display:none;">
+                    {{ recipe_form.picture }}
+                </div>
+            </div>
+
+            <div class="create-title md-text-input md-lg">
+                {{ recipe_form.title }}
+                <label for="{{ recipe_form.title.id_for_label }}">{{ recipe_form.title.label }}</label>
+            </div>
+
+            <div class="flex-row">
+                <div class="create-meta-left flex-50">
+                    <div class="flex-row">
+                        <div class="create-portion_quantity md-text-input flex-60">
+                            {{ recipe_form.portion_quantity }}
+                            <label for="{{ recipe_form.portion_quantity.id_for_label }}">{{ recipe_form.portion_quantity.label }}</label>
+                        </div>
+                        <div class="create-portion_unit md-select flex-40">
+                            {{ recipe_form.portion_unit }}
+                        </div>
+                    </div>
+                    <div class="create-preparationtime md-text-input">
+                        {{ recipe_form.preparationtime }}
+                        <label for="{{ recipe_form.preparationtime.id_for_label }}">{{ recipe_form.preparationtime.label }}</label>
+                    </div>
+                    <div class="create-cooktime md-text-input">
+                        {{ recipe_form.cooktime }}
+                        <label for="{{ recipe_form.cooktime.id_for_label }}">{{ recipe_form.cooktime.label }}</label>
+                    </div>
+                    <div class="create-resttime md-text-input">
+                        {{ recipe_form.resttime }}
+                        <label for="{{ recipe_form.resttime.id_for_label }}">{{ recipe_form.resttime.label }}</label>
+                    </div>
+                </div>
+
+                <div class="create-meta-right flex-50">
+                    <div class="create-nutrition_kcal md-text-input">
+                        {{ recipe_form.nutrition_kcal }}
+                        <label for="{{ recipe_form.nutrition_kcal.id_for_label }}">{{ recipe_form.nutrition_kcal.label }}</label>
+                    </div>
+                    <div class="create-nutrition_fat md-text-input">
+                        {{ recipe_form.nutrition_fat }}
+                        <label for="{{ recipe_form.nutrition_fat.id_for_label }}">{{ recipe_form.nutrition_fat.label }}</label>
+                    </div>
+                    <div class="create-nutrition_carbs md-text-input">
+                        {{ recipe_form.nutrition_carbs }}
+                        <label for="{{ recipe_form.nutrition_carbs.id_for_label }}">{{ recipe_form.nutrition_carbs.label }}</label>
+                    </div>
+                    <div class="create-nutrition_protein md-text-input">
+                        {{ recipe_form.nutrition_protein }}
+                        <label for="{{ recipe_form.nutrition_protein.id_for_label }}">{{ recipe_form.nutrition_protein.label }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="create-tag">
+                {{ recipe_form.tags }}
+            </div>
+
+
+            <div class="flex-row">
+                <div class="ingredient-form flex-50">
+                    {% regroup ingredient_formset by group.value as ingredient_groupset %}
+                    {% for group in ingredient_groupset %}
+                        <div class="ingredient-group">
+                            <div class="md-text-input ingredient-group-name">
+                                <input id="group-input-{{ group.grouper }}" class="ingredient-group-input" type="text" value="{{ group.grouper }}">
+                                <label for="group-input-{{ group.grouper }}">Zwischenschritt</label>
+                            </div>
+
+                            {% for ingredient_form in group.list %}
+                                {{ ingredient_form.DELETE }}
+
+                                <div class="create-ingredient flex-row">
+                                    <div class="ingredient-delete">
+                                        <label for="{{ ingredient_form.DELETE.id_for_label }}">{{ ingredient_form.DELETE.label }}</label>
+                                    </div>
+
+                                    <div class="md-text-input flex-40">
+                                        {{ ingredient_form.quantity }}
+                                        <label for="{{ ingredient_form.quantity.id_for_label }}">{{ ingredient_form.quantity.label }}</label>
+                                    </div>
+                                    <div class="md-text-input flex-60">
+                                        {{ ingredient_form.name }}
+                                        <label for="{{ ingredient_form.name.id_for_label }}">{{ ingredient_form.name.label }}</label>
+                                    </div>
+
+                                    {% for field in ingredient_form.hidden_fields %}
+                                        {{ field }}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="direction-form flex-50">
+                    {% for direction_form in direction_formset %}
+                        {{ direction_form.DELETE }}
+
+                        <div class="create-direction">
+                            <div class="direction-delete">
+                                <label for="{{ direction_form.DELETE.id_for_label }}">{{ direction_form.DELETE.label }}</label>
+                            </div>
+
+                            <div class="md-text-input flex-40">
+                                {{ direction_form.description }}
+                                <label for="{{ direction_form.description.id_for_label }}">{{ direction_form.description.label }}</label>
+                            </div>
+
+                            {% for field in direction_form.hidden_fields %}
+                                {{ field }}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </form>
+{{ recipe_form.errors }}
+{{ ingredient_formset.errors }}
+</div>
+{% endblock %}

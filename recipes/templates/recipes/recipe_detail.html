@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block js-foot %}
+{{ block.super }}
+<script src="{% static 'recipes/script/mobile-tabs.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block title %}Rezept: {{ recipe.title }}{% endblock %}
+
+
+{% block header-right %}
+<div class="header-button button-share">
+    <a href="{% url 'recipes:public' slug=recipe.public_slug %}"></a>
+</div>
+<div class="header-button button-edit">
+    <a href="{% url 'recipes:edit' pk=recipe.pk %}"></a>
+</div>
+{{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+<div class="recipe gutter">
+    <div class="recipe-header">
+        <section class="">
+            <div class="image">
+                {% if recipe.picture_set.get %}
+                    <img src="{{ recipe.picture_set.get.image.url }}" alt="{{ recipe.title }}">
+                {% endif %}
+            </div>
+            <h1 class="title">{{ recipe.title }}</h1>
+            <aside class="description">
+                <div class="tags">
+                    {% include 'recipes/tag_list.html' with tag_list=recipe.tags.all %}
+                </div>
+                <div class="recipe-times">
+                    {% if recipe.preparationtime %}
+                        <div class="duration-type">
+                            <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.preparationtime }} min</div>
+                        </div>
+                    {% endif %}
+                    {% if recipe.cooktime %}
+                        <div class="duration-type">
+                            <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.cooktime }} min</div>
+                        </div>
+                    {% endif %}
+                    {% if recipe.resttime %}
+                        <div class="duration-type">
+                            <div class="duration-title">Ruhezeit:</div><div>{{ recipe.resttime }} Stunden</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </aside>
+        </section>
+    </div>
+
+    <div class="recipe-details">
+
+        <div class="mobile-tabs">
+            <button class="section-title mobile" id="ingredients-title">Zutaten</button>
+            <button class="section-title mobile" id="directions-title">Zubereitung</button>
+        </div>
+
+        <section class="ingredients">
+            <h3 class="section-title desktop">Zutaten</h3>
+                <div class="section-content" id="ingredients-content">
+                    {% if recipe.portion_unit %}
+                    <div class="ingredient-portion">
+                        <div>ergibt {{ recipe.portion_quantity|floatformat }} {{ recipe.get_portion_unit_display }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="ingredient-details">
+                        {% regroup recipe.ingredient_set.all by group as ingredient_set %}
+                        {% for group in ingredient_set %}
+                            <div>
+                                <div class="ingredients-group">{{ group.grouper|upper }}</div>
+                                <ul class="ingredient-list">
+                                    {% for ingredient in group.list %}
+                                        <li class="ingredient-item">
+                                            <span class="ingredient-quantity"> {{ ingredient.quantity }} </span>
+                                            <span class="ingredient-name"> {{ ingredient.name }} </span>
+                                        </li>
+                                    {% empty %}
+                                        <li class="ingredient-item"> Keine Zutaten gefunden</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if recipe.nutrition_kcal %}
+                    <div class="nutrition">
+                        <h4 class="nutrition-title">Nährwert pro Portion</h4>
+                        <ul class="nutrition-list">
+                            <li>{{ recipe.nutrition_kcal|floatformat }} kcal</li>
+                            <li>{{ recipe.nutrition_carbs|floatformat }} g Kohlenhydrate</li>
+                            <li>{{ recipe.nutrition_fat|floatformat }} g Fett</li>
+                            <li>{{ recipe.nutrition_protein|floatformat }} g Eiweiss</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+        </section>
+
+        <section class="directions">
+            <h3 class="section-title desktop">Zubereitung</h3>
+                <div class="section-content" id="directions-content">
+                    {% for direction in recipe.direction_set.all %}
+                        <div class="direction-row">
+                            <h4 class="direction-step">{{ direction.step }}</h4>
+                            <div class="direction-text">{{ direction.description }}</div>
+                        </div>
+                    {% empty %}
+                        <div class="direction-row">
+                            Keine Zubereitungsschritte gefunden
+                        </div>
+                    {% endfor %}
+
+                    {% if recipe.note %}
+                        <div class="recipe-notes">
+                            {{ recipe.note }}
+                        </div>
+                    {% endif %}
+                </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

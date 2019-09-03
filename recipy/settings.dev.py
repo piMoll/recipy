@@ -26,11 +26,15 @@ SECRET_KEY = 'l(4kus0(49woz9vi8j&*n(!!ngne2h#w=3lztlw*mp)h#or6vi'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+if os.getenv('HOST', None):
+    ALLOWED_HOSTS.append(os.getenv('HOST'))
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'recipes.apps.RecipesConfig',
+    'crawler.apps.CrawlerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,8 +58,7 @@ ROOT_URLCONF = 'recipy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Zurich'
 
 USE_I18N = True
 
@@ -119,3 +122,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+# Images
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/'

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Rezeptsuche{% if search_results %}: {{ search_string }}{% endif %}{% endblock %}
+
+
+{% block header-after %}
+<div class="gutter search">
+    <h1>Rezeptsuche</h1>
+
+    <form method="get">
+        <input class="search-string" type="text" name="search_string" value="{{ search_string }}" placeholder="Nach Rezept, Zutat, etc. suchen">
+
+        {# persist tags if search_string changes #}
+        {% for tag, _ , state in tag_list %}
+            {% if state %}
+                <input type="hidden" name="tag.{{ tag.name }}" value="{{ state }}">
+            {% endif %}
+        {% endfor %}
+
+        <input class="search-submit" type="submit" value="Suchen"/>
+    </form>
+
+    <div class="search-tags">
+        {% for tag, query, state in tag_list %}
+            <a style="color:{{ tag.font }};background-color:{{ tag.color }};"
+               href="?{{ query }}"
+               class="tag{% if state == 'y' %} include-tag{% elif state == 'n' %} exclude-tag{% endif %}">
+                {{ tag.name }}
+            </a>
+        {% endfor %}
+
+        {% if reset_tags %}
+            <a style="color:white;background-color:red;"
+               href="?{{ reset_tags }}"
+               class="tag">
+                Tags zurücksetzen
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="gutter search-results">
+    {% if search_results %}
+        <h3>Resultate{% if search_string %} für: {{ search_string }}{% endif %}</h3>
+        {% include 'recipes/recipe_list.html' with recipe_list=search_results %}
+    {% else %}
+        <h3>Keine Rezepte gefunden :(</h3>
+    {% endif %}
+</div>
+{% endblock %}
+
