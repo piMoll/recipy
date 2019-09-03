@@ -444,43 +444,43 @@ $header-font: white;
 }
 
 .button-home a:after {
-    background-image: url("home_" + $header-font + ".png");
+    background-image: url("../images/home_" + $header-font + ".png");
     background-repeat: no-repeat;
     background-size: 32px 32px;
 }
 
 .button-import a:after {
-    background-image: url("crawler_" + $header-font + ".png");
+    background-image: url("../images/crawler_" + $header-font + ".png");
     background-repeat: no-repeat;
     background-size: 32px 32px;
 }
 
 .button-create a:after {
-    background-image: url("create_" + $header-font + ".png");
+    background-image: url("../images/create_" + $header-font + ".png");
     background-repeat: no-repeat;
     background-size: 32px 32px;
 }
 
 .button-edit a:after {
-    background-image: url("edit_" + $header-font + ".png");
+    background-image: url("../images/edit_" + $header-font + ".png");
     background-repeat: no-repeat;
     background-size: 32px 32px;
 }
 
 .button-close a:after {
-    background-image: url("close_" + $header-font + ".png");
+    background-image: url("../images/close_" + $header-font + ".png");
     background-repeat: no-repeat;
     background-size: 32px 32px;
 }
 
 .button-share a:after {
-    background-image: url("share_" + $header-font + ".png");
+    background-image: url("../images/share_" + $header-font + ".png");
     background-repeat: no-repeat;
     background-size: 32px 32px;
 }
 
 .button-logout a:after {
-    background-image: url("logout_" + $header-font + ".png");
+    background-image: url("../images/logout_" + $header-font + ".png");
     background-repeat: no-repeat;
     background-size: 32px 32px;
 }
@@ -538,7 +538,7 @@ $header-font: white;
     display: block;
     width: 30px;
     height: 30px;
-    background: url("search_black.png") no-repeat 8px 8px;
+    background: url("../images/search_black.png") no-repeat 8px 8px;
     background-size: 30px 30px;
     font-size: 0;
     box-sizing: content-box;
@@ -788,7 +788,7 @@ $md-text-input-padding: 10px;
         height: 100%;
         width: 100%;
 
-        background-image: url("delete_black.png");
+        background-image: url("../images/delete_black.png");
         background-size: $size $size;
         background-position: $offset $offset;
         background-repeat: no-repeat;
