@@ -20,12 +20,16 @@
 <body>
 
 {% block header %}
+    {% if user.is_authenticated %}
     <div class="page-header">
         <div class="header-nav">
             <div class="header-buttons-left">
                 {% block header-left %}
                     <div class="header-button button-home">
                         <a href="/"></a>
+                    </div>
+                    <div class="header-button button-logout">
+                        <a href="{% url 'logout' %}"></a>
                     </div>
                 {% endblock %}
             </div>
@@ -39,6 +43,7 @@
         </div>
         {% block header-after %}{% endblock %}
     </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}{% endblock %}

@@ -20,7 +20,6 @@ class RecipeDetailsPublicView(DetailView):
     model = Recipe
     slug_field = 'public_slug'
     context_object_name = 'recipe'
-    template_name_suffix = '_public'
 
 
 @login_required

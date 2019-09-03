@@ -351,6 +351,11 @@ body {
   background-repeat: no-repeat;
   background-size: 32px 32px; }
 
+.button-logout a:after {
+  background-image: url("logout_white.png");
+  background-repeat: no-repeat;
+  background-size: 32px 32px; }
+
 .button-save input {
   padding: 0;
   border: 0;
