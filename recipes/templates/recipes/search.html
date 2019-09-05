@@ -22,13 +22,13 @@
     </form>
 
     <div class="search-tags">
-        {% for tag, query, state in tag_list %}
+        {% for tag, query, state in tag_list %}{% spaceless %}
             <a style="color:{{ tag.font }};background-color:{{ tag.color }};"
                href="?{{ query }}"
                class="tag{% if state == 'y' %} include-tag{% elif state == 'n' %} exclude-tag{% endif %}">
                 {{ tag.name }}
             </a>
-        {% endfor %}
+            {% endspaceless %}{% endfor %}
 
         {% if reset_tags %}
             <a style="color:white;background-color:red;"
@@ -45,7 +45,6 @@
 {% block content %}
 <div class="gutter search-results">
     {% if search_results %}
-        <h3>Resultate{% if search_string %} für: {{ search_string }}{% endif %}</h3>
         {% include 'recipes/recipe_list.html' with recipe_list=search_results %}
     {% else %}
         <h3>Keine Rezepte gefunden :(</h3>
