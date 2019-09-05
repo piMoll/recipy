@@ -1,18 +1,11 @@
 // Registration
 
-body {
-    font-family: sans-serif;
-    font-size: 14px;
-
-    @media (min-width: 768px) {
-        font-size: 16px;
-    }
-}
 
 // Login
 
 .registration-container {
     background: #f7f7ee;
+    font-size: 18px;
     border: 1px solid #eaeaea;
     border-radius: 4px;
     overflow: hidden;
@@ -24,8 +17,8 @@ body {
     flex-direction: column;
     box-shadow: 2px 2px 5px -1px rgba(0, 0, 0, 0.3);
 
-    div:first-child {
-        margin-top: 1rem;
+    @media screen and (min-width: 768px) {
+       font-size: 16px;
     }
 
     .first-row {
@@ -47,6 +40,13 @@ body {
                 width: 100%;
                 box-sizing: border-box;
             }
+        }
+    }
+    input {
+       font-size: 18px;
+
+        @media screen and (min-width: 768px) {
+           font-size: 16px;
         }
     }
 

@@ -3,10 +3,10 @@
 
     var ingredientsTitle = document.getElementById('ingredients-title');
     var directionsTitle = document.getElementById('directions-title');
-    var ingredients = document.getElementById('ingredients-content');
-    var directions = document.getElementById('directions-content');
+    var ingredients = document.getElementById('ingredients');
+    var directions = document.getElementById('directions');
 
-    ingredientsTitle.onclick = function() {
+    ingredientsTitle.onclick = function(event) {
         if (!ingredientsActive) {
             ingredientsTitle.classList.add('active');
             ingredients.classList.remove('inactive');
@@ -16,7 +16,7 @@
         }
     };
 
-    directionsTitle.onclick = function() {
+    directionsTitle.onclick = function(event) {
         if (ingredientsActive) {
             ingredientsTitle.classList.remove('active');
             ingredients.classList.add('inactive');

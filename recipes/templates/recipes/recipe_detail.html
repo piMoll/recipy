@@ -58,13 +58,12 @@
     <div class="recipe-details">
 
         <div class="mobile-tabs">
-            <button class="section-title mobile" id="ingredients-title">Zutaten</button>
-            <button class="section-title mobile" id="directions-title">Zubereitung</button>
+            <a class="section-title mobile" id="ingredients-title" href="#ingredients-title">Zutaten</a>
+            <a class="section-title mobile" id="directions-title" href="#directions-title">Zubereitung</a>
         </div>
 
-        <section class="ingredients">
+        <section id="ingredients" class="recipe-section">
             <h3 class="section-title desktop">Zutaten</h3>
-                <div class="section-content" id="ingredients-content">
                     {% if recipe.portion_unit %}
                     <div class="ingredient-portion">
                         <div>ergibt {{ recipe.portion_quantity|floatformat }} {{ recipe.get_portion_unit_display }}</div>
@@ -99,10 +98,9 @@
                         </ul>
                     </div>
                     {% endif %}
-                </div>
         </section>
 
-        <section class="directions">
+        <section id="directions" class="recipe-section">
             <h3 class="section-title desktop">Zubereitung</h3>
                 <div class="section-content" id="directions-content">
                     {% for direction in recipe.direction_set.all %}
