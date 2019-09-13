@@ -4,9 +4,10 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 
-from .models import Tag, Recipe, Picture
+from .models import Tag, Recipe, Picture, Collection
 from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet
 from recipy import settings
 
@@ -197,3 +198,10 @@ def search(request):
         )
 
     return render(request, 'recipes/search.html', context=context)
+
+class CollectionDetailsView(LoginRequiredMixin, DetailView):
+    model = Collection
+    context_object_name = 'collection'
+
+class CollectionOverviewView(LoginRequiredMixin, ListView):
+    model = Collection
