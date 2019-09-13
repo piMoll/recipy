@@ -36,9 +36,11 @@
             </div>
             <div class="header-buttons-right">
                 {% block header-right %}
+                    {% if perms.recipes.add_recipe %}
                     <div class="header-button button-create">
                         <a href="{% url 'recipes:create' %}"></a>
                     </div>
+                    {% endif %}
                 {% endblock %}
             </div>
         </div>

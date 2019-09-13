@@ -74,9 +74,11 @@ const directionsForm = `{{ direction_formset.empty_form }}`
 <div class="header-button button-save">
     <input type="submit" form="create-recipe"/>
 </div>
+{% if perms.recipes.add_recipe %}
 <div class="header-button button-import">
     <a href="{% url 'crawler:index' %}"></a>
 </div>
+{% endif %}
 {% endblock %}
 
 

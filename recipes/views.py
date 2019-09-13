@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
@@ -34,6 +35,10 @@ def create(request, pk=None):
     if pk is not None:
         recipe = get_object_or_404(Recipe, pk=pk)
         close_url = recipe.get_absolute_url()
+
+    if recipe is None and not request.user.has_perm('recipes.add_recipe') or \
+            recipe is not None and not request.user.has_perm('recipes.change_recipe'):
+        raise PermissionDenied
 
     if request.method == "POST":
         # recipe_form.save() must be called before initializing IngredientFormSet and DirectionFormSet, so we can set
