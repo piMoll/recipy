@@ -9,6 +9,18 @@ def get_slug(length):
     return '{slug:0{length}x}'.format(length=length,
                                       slug=random.randrange(16 ** length))
 
+def formated_duration(duration):
+    if not duration:
+        return ''
+    duration_str = ''
+    hours = duration // 60
+    if hours:
+        duration_str = duration_str + f"{hours} h "
+    duration = duration % 60
+    if duration:
+        minutes = duration
+        duration_str = duration_str + f"{minutes} min"
+    return duration_str
 
 class Tag(models.Model):
     BRIGHT = 'rgb(253, 246, 227)'
@@ -97,7 +109,16 @@ class Recipe(models.Model):
     
     def get_public_url(self):
         return reverse('recipes:public', kwargs={'public_slug': self.public_slug})
-
+    
+    def get_formated_preparationtime(self):
+        return formated_duration(self.preparationtime)
+    
+    def get_formated_cooktime(self):
+        return formated_duration(self.cooktime)
+    
+    def get_formated_resttime(self):
+        return formated_duration(self.resttime)
+    
 
 class Ingredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
