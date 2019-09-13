@@ -169,3 +169,6 @@ class Collection(models.Model):
                 self.public_slug = get_slug(10)
 
         return super(Collection, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('recipes:collection_detail', kwargs={'pk': self.pk})

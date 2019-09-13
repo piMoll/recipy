@@ -425,6 +425,13 @@ $recipe-list-desc-lh: 21px;
 
 /////////////// page_header ///////////////
 
+$appbar-icon-dimensions: 24px;
+$appbar-icon-spacing: 24px;
+$appbar-padding: 16px;
+
+$appbar-icon-dimensions-desktop: 36px;
+$appbar-icon-spacing-desktop: 24px;
+$appbar-padding-desktop: 18px;
 
 .page-header {
     background-color: $color-accent-dark;
@@ -441,12 +448,17 @@ $recipe-list-desc-lh: 21px;
     display: flex;
     justify-content: space-between;
     flex-direction: row;
-    height: 72px;
-    padding: 0 8px;
+    height: $appbar-icon-dimensions + 2 * $appbar-padding;
+    padding: $appbar-padding;
+    box-sizing: border-box;
+
+    @media screen and (min-width: 768px) {
+        height: $appbar-icon-dimensions-desktop + 2 * $appbar-padding-desktop;
+        padding: $appbar-padding-desktop;
+    }
 }
 
 .header-buttons-left, .header-buttons-right {
-    //flex-basis: 1px;
     flex-grow: 0;
 
     display: flex;
@@ -454,66 +466,65 @@ $recipe-list-desc-lh: 21px;
 }
 
 .header-button {
-    width: 72px;
-    height: 72px;
+    width: $appbar-icon-dimensions;
+    height: $appbar-icon-dimensions;
+    margin-left: $appbar-icon-spacing;
     position: relative;
+    cursor: pointer;
+
+    &:first-child {
+        margin-left: 0;
+    }
+
+    @media screen and (min-width: 768px) {
+        width: $appbar-icon-dimensions-desktop;
+        height: $appbar-icon-dimensions-desktop;
+        margin-left: $appbar-icon-spacing-desktop;
+    }
 
     a {
-        width: 100%;
-        height: 100%;
+        outline: none;
 
         &:after {
             content: '';
             display: block;
-            width: 32px;
-            height: 32px;
-            position: absolute;
-            top: 20px;
-            left: 20px;
+            height: 100%;
+            background-size: $appbar-icon-dimensions $appbar-icon-dimensions;
+            background-repeat: no-repeat;
+
+            @media screen and (min-width: 768px) {
+                background-size: $appbar-icon-dimensions-desktop $appbar-icon-dimensions-desktop;
+            }
         }
     }
 }
 
 .button-home a:after {
     background-image: url("../images/home_" + $color-icon-font + ".png");
-    background-repeat: no-repeat;
-    background-size: 32px 32px;
 }
 
 .button-import a:after {
     background-image: url("../images/crawler_" + $color-icon-font + ".png");
-    background-repeat: no-repeat;
-    background-size: 32px 32px;
 }
 
 .button-create a:after {
     background-image: url("../images/create_" + $color-icon-font + ".png");
-    background-repeat: no-repeat;
-    background-size: 32px 32px;
 }
 
 .button-edit a:after {
     background-image: url("../images/edit_" + $color-icon-font + ".png");
-    background-repeat: no-repeat;
-    background-size: 32px 32px;
 }
 
 .button-close a:after {
     background-image: url("../images/close_" + $color-icon-font + ".png");
-    background-repeat: no-repeat;
-    background-size: 32px 32px;
 }
 
 .button-share a:after {
     background-image: url("../images/share_" + $color-icon-font + ".png");
-    background-repeat: no-repeat;
-    background-size: 32px 32px;
 }
 
 .button-logout a:after {
     background-image: url("../images/logout_" + $color-icon-font + ".png");
-    background-repeat: no-repeat;
-    background-size: 32px 32px;
 }
 
 .button-save {
@@ -524,12 +535,15 @@ $recipe-list-desc-lh: 21px;
         font-size: 0;
         width: 100%;
         height: 100%;
-        cursor: pointer;
         background-color: transparent;
         background-image: url("../images/save_" + $color-icon-font + ".png");
-        background-position: 20px 20px;
         background-repeat: no-repeat;
-        background-size: 32px 32px;
+        background-size: $appbar-icon-dimensions $appbar-icon-dimensions;
+        cursor: pointer;
+
+        @media screen and (min-width: 768px) {
+            background-size: $appbar-icon-dimensions-desktop $appbar-icon-dimensions-desktop;
+        }
     }
 }
 
@@ -835,3 +849,57 @@ $md-text-input-padding: 10px;
         opacity: 0.6;
     }
 }
+
+
+
+
+
+/////////////// Collection ///////////////
+
+
+/////////////// collection_list ///////////////
+
+
+.collection-container {
+    margin: 40px 0;
+}
+
+.collection-title {
+    a {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: inherit;
+        text-decoration: none !important;
+    }
+}
+
+.collection_recipe_list {
+    margin: 1rem 0;
+}
+
+
+
+/////////////// collection_recipe_list ///////////////
+
+
+
+.collection_recipe_list {
+    .recipe-list-overflow {
+        justify-content: flex-start;
+    }
+    .recipe-list-gutter {
+        flex-basis: 200px;
+        max-width: 220px;
+    }
+    .recipe-list-item {
+        margin: 0 7px;
+    }
+    .recipe-list-name {
+        font-size: 12px;
+        line-height: 13px;
+    }
+    .recipe-list-tags {
+        display: none;
+    }
+}
+

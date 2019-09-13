@@ -1,12 +1,12 @@
 from django import forms
 from django.views.generic import FormView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from .adapters import available_options
 import json
 
 
-class ImportForm(LoginRequiredMixin, forms.Form):
+class ImportForm(forms.Form):
     adapter = forms.TypedChoiceField(
         choices=[(key, val['name']) for key, val in available_options.items()],
         coerce=lambda key: available_options[key]['handler']
@@ -14,9 +14,11 @@ class ImportForm(LoginRequiredMixin, forms.Form):
     titles = forms.CharField(widget=forms.Textarea({"cols": 80, "rows": 10}))
 
 
-class ImportView(LoginRequiredMixin, FormView):
+class ImportView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     template_name = 'crawler/index.html'
     form_class = ImportForm
+    permission_required = ('recipes.add_recipe',)
+    raise_exception = True
 
     def form_valid(self, form):
         """

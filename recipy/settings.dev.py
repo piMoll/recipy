@@ -25,7 +25,7 @@ SECRET_KEY = 'l(4kus0(49woz9vi8j&*n(!!ngne2h#w=3lztlw*mp)h#or6vi'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 if os.getenv('HOST', None):
     ALLOWED_HOSTS.append(os.getenv('HOST'))
 
