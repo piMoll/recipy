@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Collection: {{ collection.name }}{% endblock %}
+
+
+{% block header-after %}
+<div class="gutter search">
+    <h1>{{ collection.name }}</h1>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="gutter search-results">
+    {% if collection.recipes.all %}
+        {% include 'recipes/recipe_list.html' with recipe_list=collection.recipes.all %}
+    {% else %}
+        <h3>Noch keine Rezepte vorhanden :(</h3>
+    {% endif %}
+</div>
+{% endblock %}
