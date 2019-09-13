@@ -13,9 +13,11 @@
 <div class="header-button button-share">
     <a href="{% url 'recipes:public' slug=recipe.public_slug %}"></a>
 </div>
+{% if perms.recipes.change_recipe %}
 <div class="header-button button-edit">
     <a href="{% url 'recipes:edit' pk=recipe.pk %}"></a>
 </div>
+{% endif %}
 {{ block.super }}
 {% endblock %}
 
