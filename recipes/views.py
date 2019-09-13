@@ -107,7 +107,7 @@ def get_next_tag_states(request):
     reset_tags = None  # {key: value }
 
     # go over every tag that should be displayed
-    for tag in Tag.objects.all():
+    for tag in Tag.objects.all().order_by('pk'):
         tag_key = tag.query_key()
         params = get.copy()
         current_state = params.pop(tag_key, [None])[-1]  # it's a multi value dict, so it returns a list
