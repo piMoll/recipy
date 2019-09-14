@@ -5,12 +5,18 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
+from django.views.generic import ListView, RedirectView
 from django.views.generic.detail import DetailView
 
 from .models import Tag, Recipe, Picture, Collection
 from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet
 from recipy import settings
+
+
+class RecipeShortDetailsView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        obj = get_object_or_404(Recipe, **kwargs)
+        return obj.get_absolute_url()
 
 
 class RecipeDetailsView(LoginRequiredMixin, DetailView):

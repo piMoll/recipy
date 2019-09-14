@@ -3,6 +3,7 @@ from django.db import models
 import re
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import slugify
 
 
 def get_slug(length):
@@ -92,8 +93,11 @@ class Recipe(models.Model):
 
         return super(Recipe, self).save(*args, **kwargs)
 
+    def get_display_slug(self):
+        return slugify(self.title)
+
     def get_absolute_url(self):
-        return reverse('recipes:detail', kwargs={'pk': self.pk})
+        return reverse('recipes:detail', kwargs={'pk': self.pk, 'slug': self.get_display_slug()})
     
     def get_public_url(self):
         return reverse('recipes:public', kwargs={'public_slug': self.public_slug})
