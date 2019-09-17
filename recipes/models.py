@@ -119,6 +119,9 @@ class Recipe(models.Model):
     def get_formated_resttime(self):
         return formated_duration(self.resttime)
     
+    def tags_sorted(self):
+        return self.tags.order_by('pk')
+    
 
 class Ingredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

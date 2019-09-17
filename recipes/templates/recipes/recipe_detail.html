@@ -34,7 +34,7 @@
             <h1 class="title">{{ recipe.title }}</h1>
             <aside class="description">
                 <div class="tags">
-                    {% include 'recipes/tag_list.html' with tag_list=recipe.tags.all %}
+                    {% include 'recipes/tag_list.html' with tag_list=recipe.tags_sorted %}
                 </div>
                 <div class="recipe-times">
                     {% if recipe.preparationtime %}
