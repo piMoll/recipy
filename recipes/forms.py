@@ -47,20 +47,28 @@ class IngredientForm(forms.ModelForm):
 
 
 class IngredientOrderEnumerator(BaseInlineFormSet):
-    def clean(self):
-        super().clean()
+    def save(self, commit=True):
+        """
+        First, build a summary with the following structure:
+        {
+            "TEIG": [<Ingredient Mehl>, <Ingredient Milch>,],
+        }
+        Next, for each group, for each Ingredient, set the order.
+        """
         groups = {}
-        for form in self.forms:
-            if not form.cleaned_data or form.cleaned_data['DELETE']:
+        for form in self.ordered_forms:
+            if not form.cleaned_data or self.can_delete and self._should_delete_form(form):
                 continue
             if form.instance.group not in groups:
                 groups[form.instance.group] = []
             groups[form.instance.group].append(form.instance)
+
         i = 0
-        for group in groups:
-            for instance in groups[group]:
+        for group in groups.values():
+            for instance in group:
                 i += 1
                 instance.order_item = i
+        super().save(commit=commit)
 
 
 IngredientFormSet = inlineformset_factory(
@@ -71,16 +79,11 @@ IngredientFormSet = inlineformset_factory(
         'group',
         'order_item',
     ),
-    extra=15,
+    extra=0,
+    max_num=100,
     formset=IngredientOrderEnumerator,
-    widgets={
-        'quantity': TextInput(),
-        'name': TextInput(),
-        'order_item': HiddenInput(),
-        'group': HiddenInput(),
-        'DELETE': HiddenInput(),
-    },
     form=IngredientForm,
+    can_order=True,
 )
 
 
@@ -89,14 +92,14 @@ class DirectionForm(forms.ModelForm):
 
 
 class DirectionStepEnumerator(BaseInlineFormSet):
-    def clean(self):
-        super().clean()
+    def save(self, commit=True):
         i = 0
-        for form in self.forms:
-            if not form.cleaned_data or form.cleaned_data['DELETE']:
+        for form in self.ordered_forms:
+            if not form.cleaned_data or self.can_delete and self._should_delete_form(form):
                 continue
             i += 1
             form.instance.step = i
+        super().save(commit=commit)
 
 
 DirectionFormSet = inlineformset_factory(
@@ -105,13 +108,12 @@ DirectionFormSet = inlineformset_factory(
         'step',
         'description',
     ),
-    extra=7,
+    extra=0,
+    max_num=20,
     labels={
         'description': 'Schritt'
     },
-    widgets={
-        'step': HiddenInput(),
-    },
     formset=DirectionStepEnumerator,
     form=DirectionForm,
+    can_order=True,
 )

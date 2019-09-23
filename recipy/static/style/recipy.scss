@@ -691,6 +691,7 @@ $md-text-input-padding: 10px;
         left: $padding-left + 1 - $label-padding;
         padding: 0 $label-padding;
         transition: none;
+        pointer-events: none;
     }
 
     // todo: wait for :blank to be implemented

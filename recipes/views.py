@@ -35,7 +35,7 @@ def create(request, pk=None):
     recipe_form = None
     ingredient_formset = None
     direction_formset = None
-    recipe = None
+    recipe = None  # type: Recipe or None
     close_url = reverse('recipes:search')
 
     if pk is not None:
@@ -84,7 +84,7 @@ def create(request, pk=None):
                     direction_formset.save()
 
                 if no_errors:
-                    return HttpResponseRedirect(reverse('recipes:detail', kwargs={'pk': recipe.pk}))
+                    return HttpResponseRedirect(recipe.get_absolute_url())
                 else:
                     raise RuntimeError()
 

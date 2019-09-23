@@ -498,7 +498,8 @@ body {
     font-size: 0.8rem;
     left: 14px;
     padding: 0 3px;
-    transition: none; }
+    transition: none;
+    pointer-events: none; }
   .md-text-input input.blank:not(:focus) + label, .md-text-input textarea.blank:not(:focus) + label {
     font-size: 1em;
     top: 11px;
