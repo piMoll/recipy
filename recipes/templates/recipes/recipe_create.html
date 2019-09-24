@@ -29,6 +29,25 @@
 ]
 </script>
 
+<script type="application/json" id="recipe-pictures-data">
+[{% for form in picture_formset %}
+    {
+        "{{ form.image.name }}": {% if form.instance.id %}"{{ form.instance.image.url|escapejs }}"{% else %}{
+            "base64": "{{ form.instance.b64image|escapejs }}",
+            "type": "{{ form.instance.image.file.content_type|escapejs }}",
+            "name": "{{ form.instance.image.file.name|escapejs }}"
+        }{% endif %},
+{#        "{{ form.thumbnail.name }}": "{{ form.instance.thumbnail.url|escapejs }}",#}
+        "{{ form.order.name|escapejs }}": "{{ form.order.value|escapejs }}",
+        "{{ form.description.name|escapejs }}": "{{ form.description.value|escapejs }}",
+        "{{ form.id.name|escapejs }}": "{{ form.id.value|escapejs }}",
+        "{{ form.recipe.name|escapejs }}": "{{ form.recipe.value|escapejs }}",
+        "{{ form.DELETE.name|escapejs }}": "{{ form.DELETE.value|escapejs }}",
+        "{{ form.ORDER.name|escapejs }}": "{{ form.ORDER.value|escapejs }}"
+    }{% if not forloop.last %},{% endif %}{% endfor %}
+]
+</script>
+
 <script type="text/javascript">
     (function () {
         const ingredientsData = JSON.parse(document.getElementById('recipe-ingredients-data').textContent);
@@ -44,6 +63,14 @@
             el: '#direction-formset',
             propsData: {
                 initData: directionsData,
+            },
+         });
+
+        const picturesData = JSON.parse(document.getElementById('recipe-pictures-data').textContent);
+        const pictureFormset = new window.recipeCreate.PictureFormset({
+            el: '#picture-formset',
+            propsData: {
+                initData: picturesData,
             },
          });
 
@@ -95,6 +122,8 @@
             {{ field }}
         {% endfor %}
 
+        {{ picture_formset.management_form.MIN_NUM_FORMS }}
+        {{ picture_formset.management_form.MAX_NUM_FORMS }}
         {{ ingredient_formset.management_form.INITIAL_FORMS }}
         {{ ingredient_formset.management_form.MIN_NUM_FORMS }}
         {{ ingredient_formset.management_form.MAX_NUM_FORMS }}
@@ -103,17 +132,7 @@
         {{ direction_formset.management_form.MAX_NUM_FORMS }}
 
         <div class="create-form md-form">
-            <div class="image create-image">
-                {% if recipe_form.instance and recipe_form.instance.picture_set.get %}
-                <img src="{{ recipe_form.instance.picture_set.get.image.url }}" alt="The finished recipe">
-                {% endif %}
-
-                <label for="{{ recipe_form.picture.id_for_label }}">Set Picture</label>
-
-                <div style="display:none;">
-                    {{ recipe_form.picture }}
-                </div>
-            </div>
+            <div id="picture-formset"></div>
 
             <div class="create-title md-text-input md-lg">
                 {{ recipe_form.title }}

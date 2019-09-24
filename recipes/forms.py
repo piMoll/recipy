@@ -16,14 +16,10 @@ class TagSelectWidget(CheckboxSelectMultiple):
 
 
 class RecipeCreateForm(forms.ModelForm):
-    # tags = forms.ModelChoiceField(queryset=Tag.objects.all(), required=False)
-    picture = ImageField(required=False)
-
     class Meta:
         model = Recipe
         fields = (
             'title',
-            'picture',
             'preparationtime',
             'cooktime',
             'resttime',
@@ -36,14 +32,11 @@ class RecipeCreateForm(forms.ModelForm):
             'tags',
             'source',
             'note',
+            'author',
         )
         widgets = {
             'tags': TagSelectWidget
         }
-
-
-class IngredientForm(forms.ModelForm):
-    order_item = forms.IntegerField(required=False)
 
 
 class IngredientOrderEnumerator(BaseInlineFormSet):
@@ -82,13 +75,8 @@ IngredientFormSet = inlineformset_factory(
     extra=0,
     max_num=100,
     formset=IngredientOrderEnumerator,
-    form=IngredientForm,
     can_order=True,
 )
-
-
-class DirectionForm(forms.ModelForm):
-    step = forms.IntegerField(required=False)
 
 
 class DirectionStepEnumerator(BaseInlineFormSet):
@@ -114,6 +102,23 @@ DirectionFormSet = inlineformset_factory(
         'description': 'Schritt'
     },
     formset=DirectionStepEnumerator,
-    form=DirectionForm,
     can_order=True,
+)
+
+
+class PictureForm(forms.ModelForm):
+    image = ImageField(required=False)
+
+
+PictureFormSet = inlineformset_factory(
+    Recipe, Picture,
+    fields=(
+        'image',
+        'order',
+        'description',
+    ),
+    extra=0,
+    max_num=10,
+    can_order=True,
+    form=PictureForm,
 )

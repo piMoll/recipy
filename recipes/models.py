@@ -69,7 +69,7 @@ class Recipe(models.Model):
     nutrition_protein = models.FloatField(blank=True, null=True)
     # meant for: Tipp, Hinweis, kleine Mengen, eigene Notizen
     note = models.TextField(blank=True, default='')
-    author = models.CharField(max_length=100)
+    author = models.CharField(max_length=100, blank=True)
     source = models.CharField(
         max_length=255,
         blank=True,
@@ -141,7 +141,8 @@ class Picture(models.Model):
         return f'Picture {self.id}'
 
     def save(self, *args, **kwargs):
-        self.image.name = self.get_file()
+        if not self.id:
+            self.image.name = self.get_file()
 
         super(Picture, self).save(*args, **kwargs)
 
@@ -150,10 +151,20 @@ class Picture(models.Model):
         super().delete(using=using, keep_parents=keep_parents)
 
     def get_file(self):
+        if self.id:
+            raise RuntimeError('Not safe to call get_file after object has been saved')
+
         recipe_id = f'{self.recipe_id:04d}'
         random_slug = get_slug(8)
         extension = self.image.file.content_type.split('/')[1]
         return f'{recipe_id}_{random_slug}.{extension}'
+
+    def b64image(self):
+        import base64
+        file = self.image.file
+        with file.open('rb') as fh:
+            code = base64.b64encode(fh.read())
+        return code.decode('utf-8')
 
 
 class Collection(models.Model):

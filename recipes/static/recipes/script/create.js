@@ -11,6 +11,26 @@
         return ('00000000' + num.toString(16)).substr(-8);
     }
 
+    function b64toBlob(b64Data, contentType='', sliceSize=512) {
+        const byteCharacters = atob(b64Data);
+        const byteArrays = [];
+
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+
+        const blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+    }
+
     const Ingredient = {
         template: `
 <div class="create-ingredient flex-row" v-show="!deleted">
@@ -133,6 +153,7 @@
     };
 
     const IngredientFormset = {
+        name: 'IngredientFormset',
         template: `
 <div class="ingredient-form flex-50">
     <input type="hidden" name="ingredient_set-TOTAL_FORMS" :value="totalForms">
@@ -363,6 +384,7 @@
     };
 
     const DirectionFormset = {
+        name: 'DirectionFormset',
         template: `
 <div class="direction-form flex-50">
     <input type="hidden" name="direction_set-TOTAL_FORMS" :value="totalForms">
@@ -454,8 +476,183 @@
         },
     };
 
+    /**
+     * Pictures can have the following states:
+     * - Currently existing in DB: picture.id && picture.image
+     * - Just added: !picture.id && picture.image
+     * - An empty FileInput: !picture.id && !picture.image
+     */
+    const PictureFormset = {
+        name: 'PictureFormset',
+        template: `
+<div class="image create-image">
+    <input type="hidden" name="picture_set-TOTAL_FORMS" :value="totalForms">
+    <input type="hidden" name="picture_set-INITIAL_FORMS" :value="initialForms">
+
+    <div class="image">
+        <img :src="selection.image" alt="Siehe Beschreibung">
+    </div>
+    
+    <div class="image-list">
+        <div class="scroll-wrap">
+            <div
+              class="button"
+              :class="{'add-picture': !picture.image}"
+              v-for="picture in itemList"
+              :key="picture.tid"
+              v-show="!picture.deleted"
+            >
+                <input type="hidden" :name="fieldname(picture, 'order')" :value="picture.order">
+                <input type="hidden" :name="fieldname(picture, 'description')" :value="picture.description">
+                <input type="hidden" :name="fieldname(picture, 'id')" :value="picture.id">
+                <input type="hidden" :name="fieldname(picture, 'recipe')" :value="picture.recipe">
+                <input type="hidden" :name="fieldname(picture, 'ORDER')" :value="picture.order - 1">
+                
+                <input type="hidden" :name="fieldname(picture, 'DELETE')" value="True" v-if="picture.deleted">
+                
+                <input
+                  type="file"
+                  :name="fieldname(picture, 'image')"
+                  :id="fieldname(picture, 'image')"
+                  v-if="!picture.id"
+                  v-show="false"
+                  accept="image/*"
+                  @change="e => create(picture.tid, e.target)"
+                  ref="fileinput"
+                  :data-tid="picture.tid"
+                >
+                <label :for="fieldname(picture, 'image')" v-show="!picture.image"></label>
+            
+                <img :src="picture.image" @click="() => selection = picture" v-show="picture.image">
+                
+                <div class="picture-delete" v-show="picture.image">
+                    <label @click="() => deletePicture(picture)"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>`,
+        props: {
+            initData: Array,
+        },
+        data() {
+            return {
+                items: {},
+                newItems: {},
+                initialForms: null,
+                recipe: null,
+                selection: {},
+            };
+        },
+        computed: {
+            itemList() {
+                return ownProps(this.items)
+                    .concat(ownProps(this.newItems))
+                    .sort((a, b) => a.order - b.order)
+                    .concat(this.mockModel())
+            },
+            totalForms() {
+                return Object.keys(this.items).length + Object.keys(this.newItems).length;
+            },
+            fieldname() {
+                return (picture, field) => (typeof picture.form !== 'undefined') ?
+                    `picture_set-${picture.form}-${field}` : '';
+            },
+        },
+        methods: {
+            log: console.log.bind(console),
+            create(tid, input) {
+                if (!(input.files && input.files[0])) return;
+
+                const image = URL.createObjectURL(input.files[0]);
+
+                this.$set(this.newItems, tid, {
+                    image,
+                    description: '',
+                    recipe: this.recipe,
+                    id: '',
+                    form: this.totalForms, // zero-indexed
+                    order: this.totalForms + 1, // one-indexed
+                    tid,
+                    deleted: false,
+                });
+            },
+            deletePicture(picture) {
+                if (picture.id) picture.deleted = true;
+                else this.$delete(this.newItems, picture.tid);
+            },
+            initialize(initData) {
+                const items = {};
+                const newItems = {};
+                let recipe = null;
+                let order = 0;
+                initData.sort((a, b) => Number(a.order) - Number(b.order)).forEach(item => {
+                    const itemTid = tid();
+
+                    if (recipe !== null && item.recipe !== recipe)
+                        throw RangeError('Not all ingredients belong to the same recipe');
+                    if (recipe === null)
+                        recipe = item.recipe;
+
+                    order += 1;
+                    const model = {
+                        image: item.image,
+                        description: item.description,
+                        recipe: item.recipe,
+                        id: item.id,
+                        form: order - 1, // zero-indexed
+                        order: order, // one-indexed
+                        tid: itemTid,
+                        deleted: false,
+                    };
+                    if (!model.id) {
+                        const file = new File([b64toBlob(item.image.base64)], item.image.name, {type: item.image.type});
+                        const image = URL.createObjectURL(file);
+                        model.image = image;
+                        newItems[itemTid] = model;
+                        this.$nextTick(() => {
+                            const input = this.$refs.fileinput.filter(ref => ref.dataset.tid === itemTid)[0];
+                            const transfer = new DataTransfer();
+                            transfer.items.add(file);
+                            input.files = transfer.files;
+                        });
+                    }
+
+                    (model.id ? items : newItems)[itemTid] = model;
+                });
+                this.items = items;
+                this.newItems = newItems;
+                this.recipe = recipe;
+                this.initialForms = Object.keys(items).length;
+            },
+            mockModel() {
+                return {
+                    description: '',
+                    tid: tid(),
+                    form: this.totalForms,
+                }
+            },
+            renumberForms() {
+                let forms = 0;
+                ownProps(this.newItems).forEach(item => {
+                    if (!item.id) item.form = this.initialForms + forms++;
+                });
+            },
+        },
+        watch: {
+            totalForms(nu) {
+                if (nu > this.initialForms) this.renumberForms();
+            },
+        },
+        created() {
+            this.initialize(this.initData);
+            this.selection = this.itemList[0];
+        },
+    };
+
     window.recipeCreate = {
         IngredientFormset: Vue.extend(IngredientFormset),
         DirectionFormset: Vue.extend(DirectionFormset),
+        PictureFormset: Vue.extend(PictureFormset),
     };
 })();
