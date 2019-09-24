@@ -34,22 +34,22 @@
             <h1 class="title">{{ recipe.title }}</h1>
             <aside class="description">
                 <div class="tags">
-                    {% include 'recipes/tag_list.html' with tag_list=recipe.tags.all %}
+                    {% include 'recipes/tag_list.html' with tag_list=recipe.tags_sorted %}
                 </div>
                 <div class="recipe-times">
                     {% if recipe.preparationtime %}
                         <div class="duration-type">
-                            <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.preparationtime }} min</div>
+                            <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.get_formated_preparationtime }}</div>
                         </div>
                     {% endif %}
                     {% if recipe.cooktime %}
                         <div class="duration-type">
-                            <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.cooktime }} min</div>
+                            <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.get_formated_cooktime }}</div>
                         </div>
                     {% endif %}
                     {% if recipe.resttime %}
                         <div class="duration-type">
-                            <div class="duration-title">Ruhezeit:</div><div>{{ recipe.resttime }} Stunden</div>
+                            <div class="duration-title">Ruhezeit:</div><div>{{ recipe.get_formated_resttime }}</div>
                         </div>
                     {% endif %}
                 </div>
