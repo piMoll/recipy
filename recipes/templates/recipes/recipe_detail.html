@@ -27,29 +27,29 @@
     <div class="recipe-header">
         <section class="">
             <div class="image">
-                {% if recipe.picture_set.get %}
-                    <img src="{{ recipe.picture_set.get.image.url }}" alt="{{ recipe.title }}">
+                {% if recipe.picture_set.exists %}
+                    <img src="{{ recipe.picture_set.first.image.url }}" alt="{{ recipe.title }}">
                 {% endif %}
             </div>
             <h1 class="title">{{ recipe.title }}</h1>
             <aside class="description">
                 <div class="tags">
-                    {% include 'recipes/tag_list.html' with tag_list=recipe.tags.all %}
+                    {% include 'recipes/tag_list.html' with tag_list=recipe.tags_sorted %}
                 </div>
                 <div class="recipe-times">
                     {% if recipe.preparationtime %}
                         <div class="duration-type">
-                            <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.preparationtime }} min</div>
+                            <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.get_formated_preparationtime }}</div>
                         </div>
                     {% endif %}
                     {% if recipe.cooktime %}
                         <div class="duration-type">
-                            <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.cooktime }} min</div>
+                            <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.get_formated_cooktime }}</div>
                         </div>
                     {% endif %}
                     {% if recipe.resttime %}
                         <div class="duration-type">
-                            <div class="duration-title">Ruhezeit:</div><div>{{ recipe.resttime }} Stunden</div>
+                            <div class="duration-title">Ruhezeit:</div><div>{{ recipe.get_formated_resttime }}</div>
                         </div>
                     {% endif %}
                 </div>
@@ -122,6 +122,15 @@
                         </div>
                     {% endif %}
                 </div>
+        </section>
+
+        <section id="images">
+            {% for picture in recipe.picture_set.all|slice:"1:" %}
+                <div class="image">
+                    <img src="{{ picture.image.url }}" alt="{{ picture.description }}">
+                </div>
+            {% endfor %}
+
         </section>
     </div>
 </div>
