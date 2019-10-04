@@ -5,12 +5,18 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
+from django.views.generic import ListView, RedirectView
 from django.views.generic.detail import DetailView
 
 from .models import Tag, Recipe, Picture, Collection
-from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet
+from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet, PictureFormSet
 from recipy import settings
+
+
+class RecipeShortDetailsView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        obj = get_object_or_404(Recipe, **kwargs)
+        return obj.get_absolute_url()
 
 
 class RecipeDetailsView(LoginRequiredMixin, DetailView):
@@ -27,9 +33,10 @@ class RecipeDetailsPublicView(DetailView):
 @login_required
 def create(request, pk=None):
     recipe_form = None
+    picture_formset = None
     ingredient_formset = None
     direction_formset = None
-    recipe = None
+    recipe = None  # type: Recipe or None
     close_url = reverse('recipes:search')
 
     if pk is not None:
@@ -53,32 +60,22 @@ def create(request, pk=None):
                 if no_errors:
                     recipe = recipe_form.save()
 
-                    image = recipe_form.cleaned_data['picture']
-                    if image:
-                        # todo: add picture instead of replace
-                        if recipe.picture_set.exists():
-                            recipe.picture_set.get().delete()
-
-                        new_picture = Picture(
-                            recipe=recipe,
-                            image=image,
-                            order=0,
-                            description=''
-                        )
-                        new_picture.save()
+                picture_formset = PictureFormSet(data=request.POST, files=request.FILES, instance=recipe)
+                no_errors = no_errors and picture_formset.is_valid()
 
                 ingredient_formset = IngredientFormSet(data=request.POST, instance=recipe)
                 no_errors = no_errors and ingredient_formset.is_valid()
-                if no_errors:
-                    ingredient_formset.save()
 
                 direction_formset = DirectionFormSet(data=request.POST, instance=recipe)
                 no_errors = no_errors and direction_formset.is_valid()
+
                 if no_errors:
+                    picture_formset.save()
+                    ingredient_formset.save()
                     direction_formset.save()
 
                 if no_errors:
-                    return HttpResponseRedirect(reverse('recipes:detail', kwargs={'pk': recipe.pk}))
+                    return HttpResponseRedirect(recipe.get_absolute_url())
                 else:
                     raise RuntimeError()
 
@@ -87,11 +84,13 @@ def create(request, pk=None):
 
     elif request.method == 'GET':
         recipe_form = RecipeCreateForm(instance=recipe)
+        picture_formset = PictureFormSet(instance=recipe)
         ingredient_formset = IngredientFormSet(instance=recipe)
         direction_formset = DirectionFormSet(instance=recipe)
 
     return render(request, 'recipes/recipe_create.html', {
         'recipe_form': recipe_form,
+        'picture_formset': picture_formset,
         'ingredient_formset': ingredient_formset,
         'direction_formset': direction_formset,
         'tag_list': Tag.objects.all(),

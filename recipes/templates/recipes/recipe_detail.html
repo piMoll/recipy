@@ -27,8 +27,8 @@
     <div class="recipe-header">
         <section class="">
             <div class="image">
-                {% if recipe.picture_set.get %}
-                    <img src="{{ recipe.picture_set.get.image.url }}" alt="{{ recipe.title }}">
+                {% if recipe.picture_set.exists %}
+                    <img src="{{ recipe.picture_set.first.image.url }}" alt="{{ recipe.title }}">
                 {% endif %}
             </div>
             <h1 class="title">{{ recipe.title }}</h1>
@@ -122,6 +122,15 @@
                         </div>
                     {% endif %}
                 </div>
+        </section>
+
+        <section id="images">
+            {% for picture in recipe.picture_set.all|slice:"1:" %}
+                <div class="image">
+                    <img src="{{ picture.image.url }}" alt="{{ picture.description }}">
+                </div>
+            {% endfor %}
+
         </section>
     </div>
 </div>
