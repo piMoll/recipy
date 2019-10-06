@@ -7,6 +7,7 @@
 
 {#    <script type="text/javascript" src="{% if debug %}{% static 'recipes/script/vue.js' %}{% else %}{% static 'recipes/script/vue.min.js' %}{% endif %}"></script>#}
     <script type="text/javascript" src="{% static 'recipes/script/vue.js' %}"></script>
+    <script type="text/javascript" src="{% static 'recipes/script/vue-slicksort.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'recipes/script/create.js' %}"></script>
 {% endblock %}
 
@@ -74,6 +75,24 @@
             },
          });
 
+        const formSubmit = new window.recipeCreate.FormSubmit({
+            el: 'input.icon[type="submit"]',
+        });
+
+        formSubmit.$on('ingredient_formset', errors => ingredientFormset.showErrors(errors));
+        formSubmit.$on('direction_formset', errors => directionFormset.showErrors(errors));
+
+        function responsifyTextarea(e) {
+            const textarea = e.target;
+            window.requestAnimationFrame(() => {
+                textarea.style.height = `${textarea.scrollHeight + 2}px`;
+            });
+            textarea.style.height = '0px';
+        }
+        const noteInput = document.querySelector('.create-note textarea');
+        noteInput.addEventListener('input', responsifyTextarea);
+        responsifyTextarea({target: noteInput});
+
         return; // todo: figure out what to do about the stuff below
 
         // animate input labels
@@ -104,7 +123,7 @@
 
 {% block header-right %}
 <div class="header-button button-save">
-    <input type="submit" form="create-recipe"/>
+    <input class="icon" type="submit" form="create-recipe" data-form="create-recipe"/>
 </div>
 {% if perms.recipes.add_recipe %}
 <div class="header-button button-import">
@@ -140,13 +159,13 @@
             </div>
 
             <div class="flex-row">
-                <div class="create-meta-left flex-50">
+                <div class="create-meta-left flex-50 flex-item">
                     <div class="flex-row">
-                        <div class="create-portion_quantity md-text-input flex-60">
+                        <div class="create-portion_quantity md-text-input flex-60 flex-item">
                             {{ recipe_form.portion_quantity }}
                             <label for="{{ recipe_form.portion_quantity.id_for_label }}">{{ recipe_form.portion_quantity.label }}</label>
                         </div>
-                        <div class="create-portion_unit md-select flex-40">
+                        <div class="create-portion_unit md-select flex-40 flex-item">
                             {{ recipe_form.portion_unit }}
                         </div>
                     </div>
@@ -162,9 +181,17 @@
                         {{ recipe_form.resttime }}
                         <label for="{{ recipe_form.resttime.id_for_label }}">{{ recipe_form.resttime.label }}</label>
                     </div>
+                    <div class="create-author md-text-input">
+                        {{ recipe_form.author }}
+                        <label for="{{ recipe_form.author.id_for_label }}">{{ recipe_form.author.label }}</label>
+                    </div>
+                    <div class="create-source md-text-input">
+                        {{ recipe_form.source }}
+                        <label for="{{ recipe_form.source.id_for_label }}">{{ recipe_form.source.label }}</label>
+                    </div>
                 </div>
 
-                <div class="create-meta-right flex-50">
+                <div class="create-meta-right flex-50 flex-item">
                     <div class="create-nutrition_kcal md-text-input">
                         {{ recipe_form.nutrition_kcal }}
                         <label for="{{ recipe_form.nutrition_kcal.id_for_label }}">{{ recipe_form.nutrition_kcal.label }}</label>
@@ -181,6 +208,10 @@
                         {{ recipe_form.nutrition_protein }}
                         <label for="{{ recipe_form.nutrition_protein.id_for_label }}">{{ recipe_form.nutrition_protein.label }}</label>
                     </div>
+                    <div class="create-note md-text-input">
+                        {{ recipe_form.note }}
+                        <label for="{{ recipe_form.note.id_for_label }}">{{ recipe_form.note.label }}</label>
+                    </div>
                 </div>
             </div>
 
@@ -189,7 +220,7 @@
             </div>
 
 
-            <div class="flex-row">
+            <div class="flex-row ingredient-direction-formsets">
                 <div id="ingredient-formset"></div>
 
                 <div id="direction-formset"></div>
