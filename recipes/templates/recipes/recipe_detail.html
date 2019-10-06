@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load recipes %}
 
 {% block js-foot %}
 {{ block.super }}
@@ -28,7 +29,7 @@
         <section class="">
             <div class="image">
                 {% if recipe.picture_set.exists %}
-                    <img src="{{ recipe.picture_set.first.image.url }}" alt="{{ recipe.title }}">
+                    <img src="{{ recipe.picture_sorted.first.image.url }}" alt="{{ recipe.title }}">
                 {% endif %}
             </div>
             <h1 class="title">{{ recipe.title }}</h1>
@@ -39,17 +40,17 @@
                 <div class="recipe-times">
                     {% if recipe.preparationtime %}
                         <div class="duration-type">
-                            <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.get_formated_preparationtime }}</div>
+                            <div class="duration-title">Vorbereitungszeit:</div><div>{{ recipe.preparationtime|hours_minutes }}</div>
                         </div>
                     {% endif %}
                     {% if recipe.cooktime %}
                         <div class="duration-type">
-                            <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.get_formated_cooktime }}</div>
+                            <div class="duration-title">Koch-/Backzeit:</div><div>{{ recipe.cooktime|hours_minutes }}</div>
                         </div>
                     {% endif %}
                     {% if recipe.resttime %}
                         <div class="duration-type">
-                            <div class="duration-title">Ruhezeit:</div><div>{{ recipe.get_formated_resttime }}</div>
+                            <div class="duration-title">Ruhezeit:</div><div>{{ recipe.resttime|hours_minutes }}</div>
                         </div>
                     {% endif %}
                 </div>
@@ -125,7 +126,7 @@
         </section>
 
         <section id="images">
-            {% for picture in recipe.picture_set.all|slice:"1:" %}
+            {% for picture in recipe.picture_sorted|slice:"1:" %}
                 <div class="image">
                     <img src="{{ picture.image.url }}" alt="{{ picture.description }}">
                 </div>

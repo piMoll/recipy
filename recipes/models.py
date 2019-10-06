@@ -10,7 +10,7 @@ def get_slug(length):
     return '{slug:0{length}x}'.format(length=length,
                                       slug=random.randrange(16 ** length))
 
-def formated_duration(duration):
+def format_duration(duration):
     if not duration:
         return ''
     duration_str = ''
@@ -114,17 +114,11 @@ class Recipe(models.Model):
     def get_public_url(self):
         return reverse('recipes:public', kwargs={'public_slug': self.public_slug})
     
-    def get_formated_preparationtime(self):
-        return formated_duration(self.preparationtime)
-    
-    def get_formated_cooktime(self):
-        return formated_duration(self.cooktime)
-    
-    def get_formated_resttime(self):
-        return formated_duration(self.resttime)
-    
     def tags_sorted(self):
         return self.tags.order_by('pk')
+
+    def pictures_sorted(self):
+        return self.picture_set.order_by('order')
     
 
 class Ingredient(models.Model):
