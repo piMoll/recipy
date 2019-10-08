@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import CheckboxSelectMultiple, BaseInlineFormSet, inlineformset_factory, TextInput, HiddenInput, ImageField
+from django.forms import CheckboxSelectMultiple, BaseInlineFormSet, inlineformset_factory, ImageField, Textarea
 
 from .models import Recipe, Ingredient, Direction, Picture, Tag
 
@@ -35,7 +35,8 @@ class RecipeCreateForm(forms.ModelForm):
             'author',
         )
         widgets = {
-            'tags': TagSelectWidget
+            'tags': TagSelectWidget,
+            'note': Textarea,
         }
 
 

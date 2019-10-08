@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -38,6 +38,7 @@ def create(request, pk=None):
     direction_formset = None
     recipe = None  # type: Recipe or None
     close_url = reverse('recipes:search')
+    accept_json = request.headers['Accept'] == 'application/json'
 
     if pk is not None:
         recipe = get_object_or_404(Recipe, pk=pk)
@@ -51,6 +52,7 @@ def create(request, pk=None):
         # recipe_form.save() must be called before initializing IngredientFormSet and DirectionFormSet, so we can set
         # the instance properly. Additionally, both FormSets must be initialized so we can keep the entered data in
         # case of an error. However, if there is an error somewhere, we need to rollback the recipe_form.save().
+        # We do so by using `with transaction.atomic():`, and breaking out by means of `raise`.
         try:
             with transaction.atomic():
                 no_errors = True
@@ -73,14 +75,30 @@ def create(request, pk=None):
                     picture_formset.save()
                     ingredient_formset.save()
                     direction_formset.save()
-
-                if no_errors:
-                    return HttpResponseRedirect(recipe.get_absolute_url())
                 else:
-                    raise RuntimeError()
+                    raise RuntimeError
+
+                if accept_json:
+                    return JsonResponse({
+                        'success': True,
+                        'location': recipe.get_absolute_url()
+                    })
+                else:
+                    return HttpResponseRedirect(recipe.get_absolute_url())
 
         except RuntimeError:
-            pass  # we just need to break the __open__()
+            if accept_json:
+                forms = {
+                    'recipe_form': recipe_form,
+                    'picture_formset': picture_formset,
+                    'ingredient_formset': ingredient_formset,
+                    'direction_formset': direction_formset,
+                }
+                errors = {name: form.errors for name, form in forms.items() if not form.is_valid()}
+                return JsonResponse({
+                    'success': False,
+                    'errors': errors,
+                })
 
     elif request.method == 'GET':
         recipe_form = RecipeCreateForm(instance=recipe)

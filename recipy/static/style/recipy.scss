@@ -299,7 +299,11 @@ $page-gutter-width: 900px;
 
 .recipe-notes {
     margin: 3rem 0 1rem 1.5rem;
-    font-style: italic;
+
+    &, pre {
+        font-family: sans-serif;
+        font-style: italic;
+    }
 
     @media print {
         margin-top: 2rem;
@@ -528,7 +532,7 @@ $appbar-padding-desktop: 18px;
 }
 
 .button-save {
-    input {
+    .icon {
         padding: 0;
         border: 0;
         display: block;
@@ -620,10 +624,6 @@ $appbar-padding-desktop: 18px;
     .flex-#{$percent} {
         flex-basis: $percent * 1%;
         flex-grow: 1;
-
-        & ~ [class*="flex-"] {
-            margin-left: 10px;
-        }
     }
 }
 
@@ -635,6 +635,19 @@ $appbar-padding-desktop: 18px;
     @include flex-percent(50);
     @include flex-percent(60);
     @include flex-percent(100);
+
+    .flex-item ~ .flex-item {
+        margin-left: 10px;
+    }
+
+    .flex-special + .flex-item {
+        margin-left: 0;
+    }
+
+    .flex-special {
+        flex-shrink: 0;
+        flex-grow: 0;
+    }
 }
 
 .md-select {
@@ -692,6 +705,7 @@ $md-text-input-padding: 10px;
         padding: 0 $label-padding;
         transition: none;
         pointer-events: none;
+        user-select: none;
     }
 
     // todo: wait for :blank to be implemented
@@ -706,17 +720,18 @@ $md-text-input-padding: 10px;
     }
 }
 
+$create-image-button-height: 125px;
 .create-image {
 
     .image-list {
-        $button-height: 140px;
         $scrollbar: 15px;
+        $button-height: $create-image-button-height;
 
         margin-top: 10px;
         border: 1px solid black;
         border-radius: .3em;
         padding: 10px;
-        height: $button-height;
+        height: $button-height + $scrollbar;
         overflow: hidden;
 
         .scroll-wrap {
@@ -724,48 +739,52 @@ $md-text-input-padding: 10px;
             flex-wrap: nowrap;
             overflow-x: scroll;
             overflow-y: hidden;
-            height: $button-height - $scrollbar;
+            height: $button-height;
             padding-bottom: $scrollbar;
+            user-select: none;
         }
+    }
+}
 
-        .button {
-            position: relative;
-            height: $button-height - $scrollbar;
-            width: $button-height * 90 / 70;
-            flex-shrink: 0;
-            border-radius: .3em;
-            overflow: hidden;
-            box-sizing: border-box;
-            margin-left: 10px;
+.create-image-button {
+    $button-height: $create-image-button-height;
 
-            &:first-child {
-                margin-left: 0;
-            }
+    position: relative;
+    height: $button-height;
+    width: $button-height * 90 / 60;
+    flex-shrink: 0;
+    border-radius: .3em;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin-right: 10px;
 
-            img {
-                object-fit: cover;
-                object-position: 50% 50%;
-                height: 100%;
-            }
+    img {
+        object-fit: cover;
+        object-position: 50% 50%;
+        height: 100%;
+        width: 100%;
+        pointer-events: none;
+    }
 
-            &.add-picture {
-                border: 1px solid dimgrey;
+    &.add-picture {
+        border: 1px solid dimgrey;
+        margin-right: 0;
 
-                label {
-                    background-image: url("../images/create_black.png");
-                    background-position: 50% 50%;
-                    //background-size: ;
-                    background-repeat: no-repeat;
-                    width: 100%;
-                    height: 100%;
-                    display: block;
-                }
-            }
+        label {
+            background-image: url("../images/create_black.png");
+            background-position: 50% 50%;
+            //background-size: ;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            display: block;
         }
     }
 }
 
 .create-tag {
+    user-select: none;
+
     ul {
         list-style: none;
         display: flex;
@@ -791,39 +810,24 @@ $md-text-input-padding: 10px;
     display: none;
 }
 
-.create-ingredient {
-    margin-left: 1rem;
-    position: relative;
+@media screen and (max-width: 767px) {
+    #create-recipe .ingredient-direction-formsets {
+        flex-wrap: wrap;
 
-    :checked + & {
-        > :not(.ingredient-delete) {
-            visibility: hidden;
-        }
-
-        &:after {
-            content: 'Gelöscht';
-            position: absolute;
-            height: calc(#{$md-text-input-height} + #{$md-text-input-padding * 2});
-            right: 0;
-            bottom: 0;
-            left: 0;
-            border-radius: .3em;
-            background-color: lightblue;
-            display: flex;
-            justify-content: center; /* align horizontal */
-            align-items: center; /* align vertical */
+        .ingredient-form, .direction-form {
+            flex-basis: 100%;
+            margin: 0;
         }
     }
 }
 
-.ingredient-delete {
-    position: absolute;
-    margin-right: 1rem;
-    right: 100%;
-    bottom: 0;
+.create-ingredient {
+    :checked + & {
+        > :not(.ingredient-delete) {
+            visibility: hidden;
+        }
+    }
 }
-
-
 
 .create-direction {
     display: flex;
@@ -835,20 +839,6 @@ $md-text-input-padding: 10px;
         > :not(.direction-delete) {
             visibility: hidden;
         }
-
-        &:after {
-            content: 'Gelöscht';
-            position: absolute;
-            height: calc(#{$md-text-input-height} + #{$md-text-input-padding * 2});
-            right: 0;
-            bottom: 0;
-            left: 0;
-            border-radius: .3em;
-            background-color: lightblue;
-            display: flex;
-            justify-content: center; /* align horizontal */
-            align-items: center; /* align vertical */
-        }
     }
 
     .md-text-input {
@@ -858,29 +848,23 @@ $md-text-input-padding: 10px;
     }
 }
 
-.direction-delete {
-    margin-left: 0.8rem;
-    margin-top: 0.6rem;
-
-    order: 2;
-}
-
-.direction-delete, .ingredient-delete, .picture-delete {
-    $height-total: calc(#{$md-text-input-height} + #{$md-text-input-padding * 2});
+.direction-delete, .ingredient-delete, .picture-delete, .ingredient-handle {
+    $height-total: calc(#{$md-text-input-height} + #{$md-text-input-padding * 2 + 2});
     height: $height-total;
     width: $height-total;
+    margin-top: $md-text-input-spacing;
 
     label {
         $size: 70%;
-        $offset: 100% - $size;
+        $offset: 50%;
 
         display: block;
         height: 100%;
         width: 100%;
 
         background-image: url("../images/delete_black.png");
-        background-size: $size $size;
-        background-position: $offset $offset;
+        background-size: $size;
+        background-position: $offset;
         background-repeat: no-repeat;
         font-size: 0;
 
@@ -894,15 +878,20 @@ $md-text-input-padding: 10px;
     right: 5px;
     height: 40px;
     width: 40px;
+    margin: 0;
 
     label {
         opacity: 1;
     }
 }
 
+.ingredient-handle label {
+    background-image: url("../images/handle_black.png");
+}
 
-
-
+.error-popup {
+    color: darkred;
+}
 
 /////////////// Collection ///////////////
 
