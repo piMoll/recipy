@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block js-head %}{{ block.super }}
+
+{#    <script type="text/javascript" src="{% if debug %}{% static 'recipes/script/vue.js' %}{% else %}{% static 'recipes/script/vue.min.js' %}{% endif %}"></script>#}
+    <script type="text/javascript" src="{% static 'recipes/script/vue.js' %}"></script>
+    <script type="text/javascript" src="{% static 'recipes/script/vue-slicksort.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'recipes/script/create.js' %}"></script>
+{% endblock %}
+
+
+{% block js-foot %}{{ block.super }}
+
+<script type="application/json" id="recipe-ingredients-data">
+[{% for form in ingredient_formset %}
+    {{% for field in form %}
+        "{{ field.name|escapejs }}": "{{ field.value|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}
+    }{% if not forloop.last %},{% endif %}{% endfor %}
+]
+</script>
+
+<script type="application/json" id="recipe-directions-data">
+[{% for form in direction_formset %}
+    {{% for field in form %}
+        "{{ field.name|escapejs }}": "{{ field.value|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}
+    }{% if not forloop.last %},{% endif %}{% endfor %}
+]
+</script>
+
+<script type="application/json" id="recipe-pictures-data">
+[{% for form in picture_formset %}
+    {
+        "{{ form.image.name }}": {% if form.instance.id %}"{{ form.instance.image.url|escapejs }}"{% else %}{
+            "base64": "{{ form.instance.b64image|escapejs }}",
+            "type": "{{ form.instance.image.file.content_type|escapejs }}",
+            "name": "{{ form.instance.image.file.name|escapejs }}"
+        }{% endif %},
+{#        "{{ form.thumbnail.name }}": "{{ form.instance.thumbnail.url|escapejs }}",#}
+        "{{ form.order.name|escapejs }}": "{{ form.order.value|escapejs }}",
+        "{{ form.description.name|escapejs }}": "{{ form.description.value|escapejs }}",
+        "{{ form.id.name|escapejs }}": "{{ form.id.value|escapejs }}",
+        "{{ form.recipe.name|escapejs }}": "{{ form.recipe.value|escapejs }}",
+        "{{ form.DELETE.name|escapejs }}": "{{ form.DELETE.value|escapejs }}",
+        "{{ form.ORDER.name|escapejs }}": "{{ form.ORDER.value|escapejs }}"
+    }{% if not forloop.last %},{% endif %}{% endfor %}
+]
+</script>
+
+<script type="text/javascript">
+    (function () {
+        const ingredientsData = JSON.parse(document.getElementById('recipe-ingredients-data').textContent);
+        const ingredientFormset = new window.recipeCreate.IngredientFormset({
+            el: '#ingredient-formset',
+            propsData: {
+                initData: ingredientsData,
+            },
+        });
+
+        const directionsData = JSON.parse(document.getElementById('recipe-directions-data').textContent);
+        const directionFormset = new window.recipeCreate.DirectionFormset({
+            el: '#direction-formset',
+            propsData: {
+                initData: directionsData,
+            },
+         });
+
+        const picturesData = JSON.parse(document.getElementById('recipe-pictures-data').textContent);
+        const pictureFormset = new window.recipeCreate.PictureFormset({
+            el: '#picture-formset',
+            propsData: {
+                initData: picturesData,
+            },
+         });
+
+        const formSubmit = new window.recipeCreate.FormSubmit({
+            el: 'input.icon[type="submit"]',
+        });
+
+        formSubmit.$on('ingredient_formset', errors => ingredientFormset.showErrors(errors));
+        formSubmit.$on('direction_formset', errors => directionFormset.showErrors(errors));
+
+        function responsifyTextarea(e) {
+            const textarea = e.target;
+            window.requestAnimationFrame(() => {
+                textarea.style.height = `${textarea.scrollHeight + 2}px`;
+            });
+            textarea.style.height = '0px';
+        }
+        const noteInput = document.querySelector('.create-note textarea');
+        noteInput.addEventListener('input', responsifyTextarea);
+        responsifyTextarea({target: noteInput});
+
+        return; // todo: figure out what to do about the stuff below
+
+        // animate input labels
+        const inputs = document.querySelectorAll('.md-text-input input, .md-text-input textarea');
+        for (let i = 0; i < inputs.length; ++i) {
+            const input = inputs[i];
+            if (!input.value)
+                input.classList.add('blank');
+
+            input.addEventListener('blur', () => {
+                if (!input.value)
+                    input.classList.add('blank');
+                else
+                    input.classList.remove('blank');
+            });
+        }
+    })();
+</script>
+{% endblock %}
+
+
+{% block header-left %}
+<div class="header-button button-close">
+    <a href="{{ close_url }}"></a>
+</div>
+{% endblock %}
+
+
+{% block header-right %}
+<div class="header-button button-save">
+    <input class="icon" type="submit" form="create-recipe" data-form="create-recipe"/>
+</div>
+{% if perms.recipes.add_recipe %}
+<div class="header-button button-import">
+    <a href="{% url 'crawler:index' %}"></a>
+</div>
+{% endif %}
+{% endblock %}
+
+
+{% block content %}
+<div class="gutter">
+    <form method="post" id="create-recipe" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in recipe_form.hidden_fields %}
+            {{ field }}
+        {% endfor %}
+
+        {{ picture_formset.management_form.MIN_NUM_FORMS }}
+        {{ picture_formset.management_form.MAX_NUM_FORMS }}
+        {{ ingredient_formset.management_form.INITIAL_FORMS }}
+        {{ ingredient_formset.management_form.MIN_NUM_FORMS }}
+        {{ ingredient_formset.management_form.MAX_NUM_FORMS }}
+        {{ direction_formset.management_form.INITIAL_FORMS }}
+        {{ direction_formset.management_form.MIN_NUM_FORMS }}
+        {{ direction_formset.management_form.MAX_NUM_FORMS }}
+
+        <div class="create-form md-form">
+            <div id="picture-formset"></div>
+
+            <div class="create-title md-text-input md-lg">
+                {{ recipe_form.title }}
+                <label for="{{ recipe_form.title.id_for_label }}">{{ recipe_form.title.label }}</label>
+            </div>
+
+            <div class="flex-row">
+                <div class="create-meta-left flex-50 flex-item">
+                    <div class="flex-row">
+                        <div class="create-portion_quantity md-text-input flex-60 flex-item">
+                            {{ recipe_form.portion_quantity }}
+                            <label for="{{ recipe_form.portion_quantity.id_for_label }}">{{ recipe_form.portion_quantity.label }}</label>
+                        </div>
+                        <div class="create-portion_unit md-select flex-40 flex-item">
+                            {{ recipe_form.portion_unit }}
+                        </div>
+                    </div>
+                    <div class="create-preparationtime md-text-input">
+                        {{ recipe_form.preparationtime }}
+                        <label for="{{ recipe_form.preparationtime.id_for_label }}">{{ recipe_form.preparationtime.label }}</label>
+                    </div>
+                    <div class="create-cooktime md-text-input">
+                        {{ recipe_form.cooktime }}
+                        <label for="{{ recipe_form.cooktime.id_for_label }}">{{ recipe_form.cooktime.label }}</label>
+                    </div>
+                    <div class="create-resttime md-text-input">
+                        {{ recipe_form.resttime }}
+                        <label for="{{ recipe_form.resttime.id_for_label }}">{{ recipe_form.resttime.label }}</label>
+                    </div>
+                    <div class="create-author md-text-input">
+                        {{ recipe_form.author }}
+                        <label for="{{ recipe_form.author.id_for_label }}">{{ recipe_form.author.label }}</label>
+                    </div>
+                    <div class="create-source md-text-input">
+                        {{ recipe_form.source }}
+                        <label for="{{ recipe_form.source.id_for_label }}">{{ recipe_form.source.label }}</label>
+                    </div>
+                </div>
+
+                <div class="create-meta-right flex-50 flex-item">
+                    <div class="create-nutrition_kcal md-text-input">
+                        {{ recipe_form.nutrition_kcal }}
+                        <label for="{{ recipe_form.nutrition_kcal.id_for_label }}">{{ recipe_form.nutrition_kcal.label }}</label>
+                    </div>
+                    <div class="create-nutrition_fat md-text-input">
+                        {{ recipe_form.nutrition_fat }}
+                        <label for="{{ recipe_form.nutrition_fat.id_for_label }}">{{ recipe_form.nutrition_fat.label }}</label>
+                    </div>
+                    <div class="create-nutrition_carbs md-text-input">
+                        {{ recipe_form.nutrition_carbs }}
+                        <label for="{{ recipe_form.nutrition_carbs.id_for_label }}">{{ recipe_form.nutrition_carbs.label }}</label>
+                    </div>
+                    <div class="create-nutrition_protein md-text-input">
+                        {{ recipe_form.nutrition_protein }}
+                        <label for="{{ recipe_form.nutrition_protein.id_for_label }}">{{ recipe_form.nutrition_protein.label }}</label>
+                    </div>
+                    <div class="create-note md-text-input">
+                        {{ recipe_form.note }}
+                        <label for="{{ recipe_form.note.id_for_label }}">{{ recipe_form.note.label }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="create-tag">
+                {{ recipe_form.tags }}
+            </div>
+
+
+            <div class="flex-row ingredient-direction-formsets">
+                <div id="ingredient-formset"></div>
+
+                <div id="direction-formset"></div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

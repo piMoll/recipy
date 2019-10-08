@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Collections{% endblock %}
+
+{% block header-after %}
+<div class="gutter search">
+    <h1>Collections</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="gutter search-results">
+    <div class="collection-content">
+    {% for coll in collection_list %}
+        <div class="collection-container">
+        <div class="collection-title"><a href="{{ coll.get_absolute_url }}" title="{{ coll.name }}">{{ coll.name }}</a></div>
+        <div class="collection_recipe_list">
+        {% if coll.recipes.all %}
+            {% include 'recipes/recipe_list.html' with recipe_list=coll.recipes.all|slice:":4" %}
+        {% else %}
+            <h3>Noch keine Rezepte vorhanden :(</h3>
+        {% endif %}
+        </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

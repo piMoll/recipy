@@ -1,0 +1,15 @@
+{% for tag in tag_list %}
+    {% if link %}
+    <a href="{% url 'recipes:search' %}?{{ tag.query_key }}=y"
+    {% else %}
+    <span
+    {% endif %}
+        style="color:{{ tag.font }};background-color:{{ tag.color }};"
+        class="tag">
+        {{ tag.name }}
+    {% if link %}
+    </a>
+    {% else %}
+    </span>
+    {% endif %}
+{% endfor %}

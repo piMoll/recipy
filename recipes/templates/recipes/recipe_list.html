@@ -1,0 +1,25 @@
+<div class="recipe-list">
+    <div class="recipe-list-overflow">
+        {% for recipe in recipe_list %}
+            <div class="recipe-list-gutter">
+                <div class="recipe-list-item">
+                    <a href="{{ recipe.get_absolute_url }}"
+                       title="{{ recipe.title }}"
+                       class="recipe-list-link">
+                        <div class="recipe-list-image">
+                                <img src="{{ recipe.picture_set.first.image.url }}" alt="{{ recipe.title }}">
+                        </div>
+                        <div class="recipe-list-desc">
+                            <span class="recipe-list-name">
+                                {{ recipe.title }}
+                            </span>
+                            <div class="recipe-list-tags">
+                                {% include 'recipes/tag_list.html' with tag_list=recipe.tags.all link=False %}
+                            </div>
+                        </div>
+                    </a>
+               </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
