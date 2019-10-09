@@ -876,6 +876,7 @@
         mixins: [TemplateDataPropsMixin],
         template: `
 <button
+  class="icon"
   @click="onClick"
 ></button>`,
         props: ['form',],
