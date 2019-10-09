@@ -1,3 +1,5 @@
+{% load recipes %}
+
 <div class="recipe-list">
     <div class="recipe-list-overflow">
         {% for recipe in recipe_list %}
@@ -7,7 +9,7 @@
                        title="{{ recipe.title }}"
                        class="recipe-list-link">
                         <div class="recipe-list-image">
-                                <img src="{{ recipe.picture_set.first.image.url }}" alt="{{ recipe.title }}">
+                                <img src="{{ recipe|recipe_thumbnail }}" alt="{{ recipe.title }}">
                         </div>
                         <div class="recipe-list-desc">
                             <span class="recipe-list-name">

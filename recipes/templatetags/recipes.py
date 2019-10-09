@@ -19,3 +19,8 @@ def hours_minutes(number):
 @register.filter
 def order_by(queryset, field):
     return queryset.order_by(field)
+
+
+@register.filter
+def recipe_thumbnail(recipe):
+    return recipe.picture_set.order_by('order').first().thumbnail.url
