@@ -29,7 +29,9 @@
         <section class="">
             <div class="image">
                 {% if recipe.picture_set.exists %}
-                    <img src="{{ recipe.picture_sorted.first.image.url }}" alt="{{ recipe.title }}">
+                    {% with picture_set=recipe.picture_set|order_by:'order' %}
+                        <img src="{{ picture_set.first.image.url }}" alt="{{ recipe.title }}">
+                    {% endwith %}
                 {% endif %}
             </div>
             <h1 class="title">{{ recipe.title }}</h1>
@@ -126,12 +128,13 @@
         </section>
 
         <section id="images">
-            {% for picture in recipe.picture_sorted|slice:"1:" %}
-                <div class="image">
-                    <img src="{{ picture.image.url }}" alt="{{ picture.description }}">
-                </div>
-            {% endfor %}
-
+            {% with picture_set=recipe.picture_set|order_by:'order' %}
+                {% for picture in picture_set|slice:"1:" %}
+                    <div class="image">
+                        <img src="{{ picture.image.url }}" alt="{{ picture.description }}">
+                    </div>
+                {% endfor %}
+            {% endwith %}
         </section>
     </div>
 </div>

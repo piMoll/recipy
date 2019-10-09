@@ -117,9 +117,6 @@ class Recipe(models.Model):
     def tags_sorted(self):
         return self.tags.order_by('pk')
 
-    def pictures_sorted(self):
-        return self.picture_set.order_by('order')
-    
 
 class Ingredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

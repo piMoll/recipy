@@ -14,3 +14,8 @@ def get_setting(name):
 @register.filter
 def hours_minutes(number):
     return format_duration(number)
+
+
+@register.filter
+def order_by(queryset, field):
+    return queryset.order_by(field)
