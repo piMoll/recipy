@@ -5,11 +5,12 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, RedirectView
+from django.views.generic import View, ListView, RedirectView, TemplateView
 from django.views.generic.detail import DetailView
 
-from .models import Tag, Recipe, Picture, Collection
-from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet, PictureFormSet
+from .models import Tag, Recipe, Collection
+from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet, PictureFormSet, SearchForm
+from .templatetags.recipes import recipe_vuemodel
 from recipy import settings
 
 
@@ -154,76 +155,86 @@ def get_next_tag_states(request):
 
     return result, reset_tags
 
-@login_required
-def search(request):
-    context = {}
 
-    if request.method == 'GET':
-        tag_list, reset_tags = get_next_tag_states(request)
-        context.update(
-            tag_list=tag_list,
-            reset_tags=reset_tags
-        )
+def search_recipes(search_string=None, tags=None):
+    query = Recipe.objects.all().distinct()
 
-        random_sample_count = 6
-        random_sample = Recipe.objects.order_by('?')[:random_sample_count]
-
-        query = Recipe.objects.all().distinct()
-        query_ = query
-
-        # TODO: optimize? //stackoverflow.com/a/8637972/4427997
+    # TODO: optimize? //stackoverflow.com/a/8637972/4427997
+    if tags:
         for tag in Tag.objects.all():
-            # skip if the tag is None or ''. We don't care for multiple values, taking last is fine
-            if not request.GET.get(f'tag.{tag.name}', False):
+            if tags.get(tag.name, None) is None:  # value could be set to None, or not be set at all
                 continue
 
-            # we already checked for no value
-            val = request.GET[f'tag.{tag.name}']
-            if val == 'y':
+            if tags[tag.name]:
                 query = query.filter(tags=tag)
-            elif val == 'n':
+            else:
                 query = query.exclude(tags=tag)
 
-        search_string = request.GET.get('search_string')
-        if search_string:
+    if search_string:
+        db_backend = settings.DATABASES['default']['ENGINE'].split('.')[-1]
+        if db_backend == 'postgresql':
+            from django.contrib.postgres.aggregates import StringAgg
+            from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
-            db_backend = settings.DATABASES['default']['ENGINE'].split('.')[-1]
-            if db_backend == 'postgresql':
-                from django.contrib.postgres.aggregates import StringAgg
-                from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+            search_v = SearchVector('title', weight='B') \
+                + SearchVector(StringAgg('ingredient__name', delimiter=' '), weight='C') \
+                + SearchVector(StringAgg('direction__description', delimiter=' '), weight='C')
 
-                search_v = SearchVector('title', weight='B') \
-                    + SearchVector(StringAgg('ingredient__name', delimiter=' '), weight='C') \
-                    + SearchVector(StringAgg('direction__description', delimiter=' '), weight='C')
+            terms = [SearchQuery(term + ':*', search_type='raw') for term in search_string.split()]
+            search_q = terms[0]
+            for sq in terms[1:]:
+                search_q &= sq
 
-                terms = [SearchQuery(term + ':*', search_type='raw') for term in search_string.split()]
-                search_q = terms[0]
-                for sq in terms[1:]:
-                    search_q &= sq
+            query = query.annotate(
+                search=search_v,
+                rank=SearchRank(search_v, search_q)
+            ).filter(search=search_q).filter(rank__gt=0).order_by('-rank')
 
-                query = query.annotate(
-                    search=search_v,
-                    rank=SearchRank(search_v, search_q)
-                ).filter(search=search_q).filter(rank__gt=0).order_by('-rank')
+        else:
+            query = query.filter(title__icontains=search_string)
 
-            else:
-                query = query.filter(title__icontains=search_string)
+    return query
 
-            context.update(
-                search_string=search_string,
-            )
 
-        result = random_sample if query is query_ else query
+class SearchPageView(LoginRequiredMixin, TemplateView):
+    template_name = 'recipes/search.html'
+    random_choices = 6
 
-        context.update(
-            search_results=result,
-        )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_params = SearchForm(self.request.GET)
+        if search_params.is_valid() and search_params.search_params:
+            recipes = search_recipes(**search_params.search_params)
+        else:
+            recipes = Recipe.objects.order_by('?')[:self.random_choices]
+        context['recipes'] = recipes
+        context['search_form'] = search_params
+        return context
 
-    return render(request, 'recipes/search.html', context=context)
+
+class SearchView(LoginRequiredMixin, View):
+    def get(self, request):
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid() and search_form.search_params:
+            recipes = search_recipes(**search_form.search_params)
+            response = {
+                'success': True,
+                'recipes': recipe_vuemodel(recipes),
+            }
+            status = {}
+        else:
+            response = {
+                'success': False,
+                'errors': search_form.errors,
+            }
+            status = {'status': 400}
+        return JsonResponse(response, **status)
+
 
 class CollectionDetailsView(LoginRequiredMixin, DetailView):
     model = Collection
     context_object_name = 'collection'
+
 
 class CollectionOverviewView(LoginRequiredMixin, ListView):
     model = Collection

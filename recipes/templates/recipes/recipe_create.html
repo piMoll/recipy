@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% load static %}
+{% load static recipes %}
 
 
 {% block js-head %}{{ block.super }}
-
-{#    <script type="text/javascript" src="{% if debug %}{% static 'recipes/script/vue.js' %}{% else %}{% static 'recipes/script/vue.min.js' %}{% endif %}"></script>#}
-    <script type="text/javascript" src="{% static 'recipes/script/vue.js' %}"></script>
+{% if 'DEBUG'|get_setting %}
+    <script type="text/javascript" src="{% static 'recipes/script/vue.js' %}"></script>{% else %}
+    <script type="text/javascript" src="{% static 'recipes/script/vue.min.js' %}"></script>{% endif %}
     <script type="text/javascript" src="{% static 'recipes/script/vue-slicksort.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'recipes/script/create.js' %}"></script>
 {% endblock %}

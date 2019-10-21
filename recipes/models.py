@@ -10,6 +10,7 @@ def get_slug(length):
     return '{slug:0{length}x}'.format(length=length,
                                       slug=random.randrange(16 ** length))
 
+
 def format_duration(duration):
     if not duration:
         return ''
@@ -22,6 +23,7 @@ def format_duration(duration):
         minutes = duration
         duration_str = duration_str + f"{minutes} min"
     return duration_str
+
 
 class Tag(models.Model):
     BRIGHT = 'rgb(253, 246, 227)'
@@ -187,6 +189,9 @@ class Picture(models.Model):
     THUMBNAIL_WIDTH = 540
 
     def make_thumbnail(self, file):
+        """
+        :rtype: django.db.models.fields.files.ImageFieldFile
+        """
         from PIL import Image
         from io import BytesIO
         from django.core.files.base import ContentFile

@@ -1,5 +1,56 @@
 {% extends 'base.html' %}
 
+{% load static recipes %}
+
+
+{% block js-head %}{{ block.super }}
+{% if 'DEBUG'|get_setting %}
+    <script type="text/javascript" src="{% static 'recipes/script/vue.js' %}"></script>{% else %}
+    <script type="text/javascript" src="{% static 'recipes/script/vue.min.js' %}"></script>{% endif %}
+    <script type="text/javascript" src="{% static 'recipes/script/search.js' %}"></script>
+{% endblock %}
+
+
+{% block js-foot %}{{ block.super }}
+{{ recipes|recipe_vuemodel|json_script:'init-recipes' }}
+
+<script type="application/json" id="init-search">
+{
+    "search_string": "{{ search_form.search_string.value|default:''|escapejs }}",
+    "tags": [{% for tag in search_form.tags %}
+        {
+            "name": "{{ tag.name|escapejs }}",
+            "font": "{{ tag.font|escapejs }}",
+            "color": "{{ tag.color|escapejs }}",
+            "state": {% with search_form|attr:tag.query_key as field %}{{ field.value|yesno:'true,false,null' }}{% endwith %}
+        }{% if not forloop.last %},{% endif %}{% endfor %}
+    ],
+    "endpoint": "{% url 'recipes:search_api' %}"
+}
+</script>
+
+<script type="text/javascript">
+    (function () {
+        const recipeData = JSON.parse(document.getElementById('init-recipes').textContent);
+        const searchResults = new window.recipeSearch.RecipeList({
+            el: '#search-results',
+            propsData: {
+                recipes: recipeData,
+            }
+        });
+        const searchData = JSON.parse(document.getElementById('init-search').textContent);
+        const SearchWidget = window.recipeSearch.SearchWidget;
+        const searchWidget = new SearchWidget({
+            el: '#recipe-search',
+            propsData: {
+                ...searchData,
+                recipes: recipeData,
+            },
+        });
+        searchWidget.$on(SearchWidget.options.NEW_RESULT, searchResults.setItems);
+    })();
+</script>
+{% endblock %}
 
 {% block title %}Rezeptsuche{% if search_results %}: {{ search_string }}{% endif %}{% endblock %}
 
@@ -8,44 +59,46 @@
 <div class="gutter search">
     <h1>Rezeptsuche</h1>
 
-    <form method="get">
-        <input class="search-string" type="text" name="search_string" value="{{ search_string }}" placeholder="Nach Rezept, Zutat, etc. suchen">
+    <div id="recipe-search">
+        <form method="get">
+            <input class="search-string" type="text" name="search_string" value="{{ search_string }}" placeholder="Nach Rezept, Zutat, etc. suchen">
 
-        {# persist tags if search_string changes #}
-        {% for tag, _ , state in tag_list %}
-            {% if state %}
-                <input type="hidden" name="tag.{{ tag.name }}" value="{{ state }}">
-            {% endif %}
-        {% endfor %}
+            {# persist tags if search_string changes #}
+            {% for tag, _ , state in tag_list %}
+                {% if state %}
+                    <input type="hidden" name="tag.{{ tag.name }}" value="{{ state }}">
+                {% endif %}
+            {% endfor %}
 
-        <input class="search-submit" type="submit" value="Suchen"/>
-    </form>
+            <input class="search-submit" type="submit" value="Suchen"/>
+        </form>
 
-    <div class="search-tags">
-        {% for tag, query, state in tag_list %}{% spaceless %}
-            <a style="color:{{ tag.font }};background-color:{{ tag.color }};"
-               href="?{{ query }}"
-               class="tag{% if state == 'y' %} include-tag{% elif state == 'n' %} exclude-tag{% endif %}">
-                {{ tag.name }}
-            </a>
+        <div class="search-tags">
+            {% for tag, query, state in tag_list %}{% spaceless %}
+                <a style="color:{{ tag.font }};background-color:{{ tag.color }};"
+                   href="?{{ query }}"
+                   class="tag{% if state == 'y' %} include-tag{% elif state == 'n' %} exclude-tag{% endif %}">
+                    {{ tag.name }}
+                </a>
             {% endspaceless %}{% endfor %}
 
-        {% if reset_tags %}
-            <a style="color:white;background-color:red;"
-               href="?{{ reset_tags }}"
-               class="tag">
-                Tags zurücksetzen
-            </a>
-        {% endif %}
+            {% if reset_tags %}
+                <a style="color:white;background-color:red;"
+                   href="?{{ reset_tags }}"
+                   class="tag">
+                    Tags zurücksetzen
+                </a>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
 
 
 {% block content %}
-<div class="gutter search-results">
-    {% if search_results %}
-        {% include 'recipes/recipe_list.html' with recipe_list=search_results %}
+<div id="search-results" class="gutter search-results">
+    {% if recipes %}
+        {% include 'recipes/recipe_list.html' with recipe_list=recipes %}
     {% else %}
         <h3>Keine Rezepte gefunden :(</h3>
     {% endif %}

@@ -391,7 +391,7 @@
                     if (!group) return;
                     group.order = order++;
                 });
-                this.renumberForms();
+                this.reorderItems();
             },
             renumberForms() {
                 let forms = 0;
