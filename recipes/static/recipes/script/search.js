@@ -52,7 +52,7 @@
         function delayedInvoke(args) {
             _promise.finally(() => {
                 // abort if cancelled between delayedInvoke() and finally().
-                // this is somewhat incorrect, because this allows you to cancel beyond the specified delay
+                // this is somewhat incorrect, as it allows you to cancel beyond the specified delay
                 // under certain circumstances.
                 if (!activeTimeout) return;
                 invoke(args);
@@ -144,10 +144,11 @@
                 recipes_: this.recipes,
                 fetch: null,
                 skipSubmit: false,
+                delay: 400,
             }
         },
         created() {
-            this.submit = debounce(this.submit, 350);
+            this.submit = debounce(this.submit, this.delay);
 
             window.addEventListener('popstate', ({state}) => {
                 this.skipSubmit = true;
@@ -226,9 +227,11 @@
         template: `
 <div class="recipe-list-gutter">
     <div class="recipe-list-item">
-        <a :href="model.url"
-           :title="model.title"
-           class="recipe-list-link">
+        <a
+          :href="model.url"
+          :title="model.title"
+          class="recipe-list-link"
+        >
             <div class="recipe-list-image">
                     <img :src="model.thumbnail" :alt="model.title">
             </div>

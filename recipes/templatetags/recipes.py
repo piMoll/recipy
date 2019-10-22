@@ -24,7 +24,10 @@ def order_by(queryset, field):
 
 @register.filter
 def recipe_thumbnail(recipe):
-    return recipe.picture_set.order_by('order').first().thumbnail.url
+    try:
+        return recipe.picture_set.order_by('order').first().thumbnail.url
+    except AttributeError:
+        return ''
 
 
 def prepare_for_vue(recipe):
