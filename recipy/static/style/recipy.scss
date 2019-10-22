@@ -301,9 +301,10 @@ $page-gutter-width: 900px;
 .recipe-notes {
     margin: 3rem 0 1rem 1.5rem;
 
-    &, pre {
+    pre {
         font-family: sans-serif;
         font-style: italic;
+        white-space: pre-wrap;
     }
 
     @media print {
