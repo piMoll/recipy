@@ -16,7 +16,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style/registration.css' %}">
     {% endblock %}
 
-    {% block js-head %}{% endblock %}
+    {% block js-head %}
+    <script src="{% static 'script/util.js' %}"></script>
+    {% endblock %}
 </head>
 <body>
 
@@ -29,6 +31,11 @@
                     <div class="header-button button-home">
                         <a href="/"></a>
                     </div>
+                    {% if perms.collections.view_collection %}
+                    <div class="header-button button-bookmark">
+                        <a href="{% url 'recipes:collections:list' %}"></a>
+                    </div>
+                    {% endif %}
                     <div class="header-button button-logout">
                         <a href="{% url 'logout' %}"></a>
                     </div>

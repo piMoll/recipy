@@ -3,10 +3,9 @@
 {% load static recipes %}
 
 
-{% block js-head %}{{ block.super }}
-{% if 'DEBUG'|get_setting %}
+{% block js-head %}{% if 'DEBUG'|get_setting %}
     <script type="text/javascript" src="{% static 'recipes/script/vue.js' %}"></script>{% else %}
-    <script type="text/javascript" src="{% static 'recipes/script/vue.min.js' %}"></script>{% endif %}
+    <script type="text/javascript" src="{% static 'recipes/script/vue.min.js' %}"></script>{% endif %}{{ block.super }}
     <script type="text/javascript" src="{% static 'recipes/script/vue-slicksort.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'recipes/script/create.js' %}"></script>
 {% endblock %}
@@ -51,6 +50,7 @@
 
 <script type="text/javascript">
     (function () {
+
         const ingredientsData = JSON.parse(document.getElementById('recipe-ingredients-data').textContent);
         const ingredientFormset = new window.recipeCreate.IngredientFormset({
             el: '#ingredient-formset',
@@ -75,8 +75,8 @@
             },
          });
 
-        const formSubmit = new window.recipeCreate.FormSubmit({
-            el: 'input.icon[type="submit"]',
+        const formSubmit = new window.recipyUtil.FormSubmit({
+            el: '#save',
         });
 
         formSubmit.$on('ingredient_formset', errors => ingredientFormset.showErrors(errors));
@@ -93,8 +93,8 @@
         noteInput.addEventListener('input', responsifyTextarea);
         responsifyTextarea({target: noteInput});
 
-        return; // todo: figure out what to do about the stuff below
-
+        /*
+        todo: figure out what to do about this stuff
         // animate input labels
         const inputs = document.querySelectorAll('.md-text-input input, .md-text-input textarea');
         for (let i = 0; i < inputs.length; ++i) {
@@ -109,6 +109,7 @@
                     input.classList.remove('blank');
             });
         }
+        */
     })();
 </script>
 {% endblock %}
@@ -116,14 +117,14 @@
 
 {% block header-left %}
 <div class="header-button button-close">
-    <a href="{{ close_url }}"></a>
+    <a href="{% if recipe_form.instance %}{{ instance.get_absolute_url }}{% else %}{% url 'recipes:search' %}{% endif %}"></a>
 </div>
 {% endblock %}
 
 
 {% block header-right %}
 <div class="header-button button-save">
-    <input class="icon" type="submit" form="create-recipe" data-form="create-recipe"/>
+    <input id="save" class="icon" type="submit" form="create-recipe" data-form="create-recipe"/>
 </div>
 {% if perms.recipes.add_recipe %}
 <div class="header-button button-import">

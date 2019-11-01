@@ -532,6 +532,10 @@ $appbar-padding-desktop: 18px;
     background-image: url("../images/logout_" + $color-icon-font + ".png");
 }
 
+.button-bookmark a:after {
+    background-image: url("../images/bookmark_" + $color-icon-font + ".png");
+}
+
 .button-save {
     .icon {
         padding: 0;
@@ -897,6 +901,29 @@ $create-image-button-height: 125px;
 
 /////////////// Collection ///////////////
 
+#collection-name {
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+    margin-block-start: .67em;
+    margin-block-end: .67em;
+
+    border-width: 0 0 1px;
+    border-style: solid;
+    border-color: white;
+    width: 100%;
+    background: none;
+    caret-color: white;
+    color: white;
+
+    &::placeholder {
+        color: rgba(255, 255, 255, 0.7)
+    }
+}
+
+.collection-includes .recipe-list-item {
+    box-shadow: 0 0 4px 3px cornflowerblue;
+}
 
 /////////////// collection_list ///////////////
 

@@ -4,9 +4,10 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import View, ListView, RedirectView, TemplateView
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView
 
 from .models import Tag, Recipe, Collection
 from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet, PictureFormSet, SearchForm
@@ -117,45 +118,6 @@ def create(request, pk=None):
     })
 
 
-def get_next_tag_state(state):
-    return {
-        None: 'y',
-        'y': 'n',
-        'n': None,
-    }.get(state, 'y')
-
-
-def get_next_tag_states(request):
-    get = request.GET
-    result = []
-    reset_tags = None  # {key: value }
-
-    # go over every tag that should be displayed
-    for tag in Tag.objects.all().order_by('pk'):
-        tag_key = tag.query_key()
-        params = get.copy()
-        current_state = params.pop(tag_key, [None])[-1]  # it's a multi value dict, so it returns a list
-
-        next_state = get_next_tag_state(current_state)
-        if next_state:  # don't insert None values
-            params[tag_key] = next_state
-
-        if current_state is not None:
-            reset_tags = True
-
-        query = params.urlencode()
-        result.append((tag, query, current_state))
-
-    if reset_tags:
-        reset_tags = get.copy()
-        for key in get:
-            if key.startswith('tag.'):
-                del reset_tags[key]
-        reset_tags = reset_tags.urlencode()
-
-    return result, reset_tags
-
-
 def search_recipes(search_string=None, tags=None):
     query = Recipe.objects.all().distinct()
 
@@ -231,10 +193,53 @@ class SearchView(LoginRequiredMixin, View):
         return JsonResponse(response, **status)
 
 
+class CollectionShortDetailsView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        obj = get_object_or_404(Collection, **kwargs)
+        return obj.get_absolute_url()
+
+
 class CollectionDetailsView(LoginRequiredMixin, DetailView):
     model = Collection
     context_object_name = 'collection'
 
 
+class CollectionDetailsPublicView(DetailView):
+    model = Collection
+    slug_field = 'public_slug'
+    context_object_name = 'collection'
+
+
 class CollectionOverviewView(LoginRequiredMixin, ListView):
     model = Collection
+
+
+class CollectionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ('collection.change_collection', 'recipe.view_recipe')
+    model = Collection
+    fields = ('name', 'recipes')
+    extra_context = {'tags': Tag.objects.order_by('id'),}
+
+    def form_valid(self, form):
+        accept_json = self.request.headers['Accept'] == 'application/json'
+        if accept_json:
+            self.object = form.save()
+            return JsonResponse({
+                'success': True,
+                'location': self.get_success_url()
+            })
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        accept_json = self.request.headers['Accept'] == 'application/json'
+        if accept_json:
+            return JsonResponse({
+                'errors': form.errors
+            }, status=500)
+        return super().form_invalid(form)
+
+    def get_object(self, queryset=None):
+        try:
+            return super().get_object(queryset=queryset)
+        except AttributeError:
+            return None

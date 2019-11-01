@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+
+{% block header-right %}
+{% if perms.collection.change_collection %}
+<div class="header-button button-create">
+    <a href="{% url 'recipes:collections:create' %}"></a>
+</div>
+{% endif %}
+{% endblock %}

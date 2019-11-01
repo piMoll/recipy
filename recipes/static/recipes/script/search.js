@@ -1,85 +1,9 @@
 'use strict';
 
 (function () {
-    function ownProps(object) {
-        return Object.keys(object).map(key => object[key]);
-    }
+    const debounce = window.recipyUtil.debounce;
 
-    const MAX_32_BIT = Math.pow(2, 32);
-    function tid() {
-        const num = Math.floor(Math.random() * MAX_32_BIT);
-        return ('00000000' + num.toString(16)).substr(-8);
-    }
-
-    function debounce(fn, delay, awaitPrevious = false) {
-        let activeTimeout;
-        let resolve;
-        let reject;
-        let promise;
-
-        let running;
-        let _promise;
-
-        function reset() {
-            promise = new Promise((solve, ject) => {
-                resolve = solve;
-                reject = ject;
-            })
-        }
-
-        async function invoke(args) {
-            activeTimeout = null;
-
-            const _resolve = resolve;
-            const _reject = reject;
-            _promise = promise;
-            reset();
-
-            try {
-                running = true;
-                const result = await fn.apply(this, args);
-                running = false;
-
-                _resolve(result);
-
-            } catch (e) {
-                running = false;
-
-                _reject(e)
-            }
-        }
-
-        function delayedInvoke(args) {
-            _promise.finally(() => {
-                // abort if cancelled between delayedInvoke() and finally().
-                // this is somewhat incorrect, as it allows you to cancel beyond the specified delay
-                // under certain circumstances.
-                if (!activeTimeout) return;
-                invoke(args);
-            })
-        }
-
-        function debouncedFn(...args) {
-            const invocation = awaitPrevious && running ? delayedInvoke : invoke;
-
-            if (activeTimeout) window.clearTimeout(activeTimeout);
-            activeTimeout = window.setTimeout(invocation, delay, args);
-
-            return promise;
-        }
-
-        debouncedFn.cancel = function (error = null) {
-            if (activeTimeout) window.clearTimeout(activeTimeout);
-            activeTimeout = null;
-            reject(error || new Error('Cancelled'));
-            reset();
-        };
-
-        reset();
-        return debouncedFn;
-    }
-
-    const RecipeTag = {
+    const RecipeTag = Vue.extend({
         name: 'RecipeTag',
         template: `<span @click="click" class="tag" :style="{color: tag.font, 'background-color': tag.color}">{{tag.name}}</span>`,
         props: {
@@ -93,9 +17,9 @@
                 this.$emit('click', this.tag);
             },
         },
-    };
+    });
 
-    const SearchWidget = {
+    const SearchWidget = Vue.extend({
         name: 'SearchWidget',
         template: `
 <div class="recipe-search">
@@ -109,6 +33,7 @@
     <div class="search-tags">
         <RecipeTag
           v-for="tag in tags_"
+          :key="tag.id"
           :tag="tag"
           :class="{'include-tag': tag.state === true, 'exclude-tag': tag.state === false}"
           @click="() => cycleTag(tag)"
@@ -126,7 +51,8 @@
             },
             search_string: {
                 type: String,
-                required: true,
+                required: false,
+                default: '',
             },
             endpoint: {
                 type: String,
@@ -134,8 +60,14 @@
             },
             recipes: {
                 type: Array,
-                required: true,
-            }
+                required: false,
+                default() {return [];},
+            },
+            doRouting: {
+                type: Boolean,
+                required: false,
+                default: false,
+            },
         },
         data() {
             return {
@@ -150,14 +82,16 @@
         created() {
             this.submit = debounce(this.submit, this.delay);
 
-            window.addEventListener('popstate', ({state}) => {
-                this.skipSubmit = true;
-                this.searchString = state.searchString;
-                this.tags_ = state.tags_;
-                this.$emit(this.$options.NEW_RESULT, state.recipes_);
-            });
+            if (this.doRouting) {
+                window.addEventListener('popstate', ({state}) => {
+                    this.skipSubmit = true;
+                    this.searchString = state.searchString;
+                    this.tags_ = state.tags_;
+                    this.$emit(this.$options.NEW_RESULT, state.recipes_);
+                });
 
-            history.replaceState(...this.getHistoryState());
+                history.replaceState(...this.getHistoryState());
+            }
         },
         methods: {
             cycleTag(tag) {
@@ -188,9 +122,10 @@
 
                 const json = await response.json();
                 this.recipes_ = json.recipes;
-                this.$emit(this.$options.NEW_RESULT, this.recipes_);
+                this.$emit(SearchWidget.options.NEW_RESULT, this.recipes_);
 
-                history.pushState(...this.getHistoryState());
+                if (this.doRouting)
+                    history.pushState(...this.getHistoryState());
             },
             querystring() {
                 let tags = this.tags_
@@ -219,10 +154,10 @@
             searchString: 'indirectSubmit',
         },
 
-        NEW_RESULT: 'NEW_RESULT',
-    };
+        NEW_RESULT: 'new-result',
+    });
 
-    const Recipe = {
+    const Recipe = Vue.extend({
         name: 'Recipe',
         template: `
 <div class="recipe-list-gutter">
@@ -231,6 +166,7 @@
           :href="model.url"
           :title="model.title"
           class="recipe-list-link"
+          @click="$emit('click', $event, model)"
         >
             <div class="recipe-list-image">
                     <img :src="model.thumbnail" :alt="model.title">
@@ -242,6 +178,7 @@
                 <div class="recipe-list-tags">
                     <RecipeTag
                       v-for="tag in model.tags"
+                      :key="tag.id"
                       :tag="tag"
                       :style="{color: tag.font, 'background-color': tag.color}"
                     />
@@ -260,18 +197,19 @@
                 required: true,
             }
         }
-    };
+    });
 
-    const RecipeList = {
+    const RecipeList = Vue.extend({
         name: 'RecipeList',
         template: `
 <div class="gutter search-results">
     <div class="recipe-list">
         <div class="recipe-list-overflow">
-            <Recipe
-              v-for="recipe in recipes"
-              :model="recipe"
-            />
+            <template v-for="recipe in recipes"">
+                <slot :recipes="recipes" :recipe="recipe">
+                    <Recipe :key="recipe.id" :model="recipe" @click="recipeClicked" :class="recipeClass(recipe)"/>
+                </slot>
+            </template>
         </div>
     </div>
     <h3 v-show="this.recipes.length === 0">Keine Rezepte gefunden :(</h3>
@@ -284,17 +222,24 @@
             recipes: {
                 type: Array,
                 required: false,
+                default() {return [];},
             },
         },
         methods: {
             setItems(newItems) {
                 this.$props.recipes = newItems;
             },
-        }
-    };
+            consume(searchWidget) {
+                searchWidget.$on(SearchWidget.options.NEW_RESULT, this.setItems);
+            },
+            recipeClicked() {},
+            recipeClass(recipe) {},
+        },
+    });
 
     window.recipeSearch = {
-        SearchWidget: Vue.extend(SearchWidget),
-        RecipeList: Vue.extend(RecipeList),
+        SearchWidget,
+        RecipeList,
+        Recipe,
     };
 })();

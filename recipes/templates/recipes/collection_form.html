@@ -1,0 +1,130 @@
+{% extends 'recipes/collection_base.html' %}
+
+
+{% load static recipes %}
+
+
+{% block js-head %}{% if 'DEBUG'|get_setting %}
+    <script type="text/javascript" src="{% static 'recipes/script/vue.js' %}"></script>{% else %}
+    <script type="text/javascript" src="{% static 'recipes/script/vue.min.js' %}"></script>{% endif %}{{ block.super }}
+    <script src="{% static 'recipes/script/collection.js' %}"></script>
+    <script src="{% static 'recipes/script/search.js' %}"></script>
+{% endblock %}
+
+
+{% block js-foot %}
+    {{ collection.recipes|recipe_vuemodel|json_script:'initial-recipes' }}
+
+    <script>
+        (function () {
+            const {TextInput, CollectionForm} = window.collectionForm,
+                {SearchWidget, RecipeList, Recipe} = window.recipeSearch,
+                {FormSubmit, ownProps} = window.recipyUtil;
+
+            const searchWidget = new SearchWidget({
+                el: '#search-widget',
+                propsData: {
+                    endpoint: "{% url 'recipes:search_api' %}",
+                    tags: [{% for tag in tags %}
+                        {
+                            name: "{{ tag.name|escapejs }}",
+                            font: "{{ tag.font|escapejs }}",
+                            color: "{{ tag.color|escapejs }}",
+                            state: null
+                        }{% if not forloop.last %},{% endif %}{% endfor %}
+                    ],
+                }
+            });
+
+            const recipeList = new RecipeList({
+                el: '#collection-recipes',
+                methods: {
+                    recipeClicked(event, model) {
+                        event.preventDefault();
+                        collectionForm.toggle(model);
+                    },
+                    recipeClass(recipe) {
+                        return {'collection-includes': collectionForm.hasRecipe(recipe)};
+                    },
+                },
+            });
+
+            recipeList.consume(searchWidget);
+
+            const initialRecipes = {};
+            JSON.parse(document.getElementById('initial-recipes').textContent).forEach(recipe => {
+                initialRecipes[recipe.id] = recipe;
+            });
+
+            const collectionForm = new CollectionForm({
+                el: '#collection-form',
+                propsData: {
+                    collection: {{% if collection %}
+                        id: {{ collection.id }},{% endif %}
+                        name: "{{ collection.name|escapejs }}",
+                        recipes: initialRecipes,
+                    },
+                },
+            });
+
+            recipeList.setItems(ownProps(collectionForm.collection.recipes).sort((a, b) => a.id - b.id));
+
+            const headerInput = new TextInput({
+                el: '#collection-name',
+                propsData: {
+                    value: collectionForm.collection.name,
+                    id: 'collection-name',
+                    placeholder: '(Titel)'
+                },
+            });
+
+            // v-model by hand
+            headerInput.$on('input', name => collectionForm.collection.name = name);
+            collectionForm.$watch('collection.name', nu => headerInput.value = nu);
+
+            const submit = new FormSubmit({
+                el: '#save',
+                propsData: {
+                    form: collectionForm.form(),
+                }
+            })
+        })();
+    </script>
+{% endblock %}
+
+
+{% block title %}Collection: {{ collection.name }}{% endblock %}
+
+
+{% block header-left %}
+<div class="header-button button-close">
+    <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'recipes:collections:list' %}{% endif %}"></a>
+</div>
+{% endblock %}
+
+
+{% block header-right %}
+{% if perms.collection.change_collection %}
+<div class="header-button button-save">
+    <input id="save" class="icon" type="submit" form="collection-recipes"/>
+</div>
+{% endif %}
+{% endblock %}
+
+
+{% block header-after %}
+<div class="gutter search">
+    <h1 id="collection-name">{{ collection.name }}</h1>
+    <div id="search-widget"></div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="gutter search-results">
+    <form method="post" id="collection-recipes">
+        {{ form.as_p }}
+    </form>
+    <div id="collection-form"></div>
+</div>
+{% endblock %}

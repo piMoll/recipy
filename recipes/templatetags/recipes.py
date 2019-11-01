@@ -55,5 +55,7 @@ def attr(dictionary, key):
 
 @register.filter
 def recipe_vuemodel(recipes):
+    if not recipes:
+        return []
     recipes = recipes.prefetch_related('picture_set', 'tags')
     return [prepare_for_vue(recipe) for recipe in recipes]
