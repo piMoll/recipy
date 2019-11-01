@@ -213,9 +213,10 @@ body {
 
 .recipe-notes {
   margin: 3rem 0 1rem 1.5rem; }
-  .recipe-notes, .recipe-notes pre {
+  .recipe-notes pre {
     font-family: sans-serif;
-    font-style: italic; }
+    font-style: italic;
+    white-space: pre-wrap; }
   @media print {
     .recipe-notes {
       margin-top: 2rem; } }
