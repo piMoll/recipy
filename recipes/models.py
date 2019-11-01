@@ -10,6 +10,7 @@ def get_slug(length):
     return '{slug:0{length}x}'.format(length=length,
                                       slug=random.randrange(16 ** length))
 
+
 def format_duration(duration):
     if not duration:
         return ''
@@ -22,6 +23,7 @@ def format_duration(duration):
         minutes = duration
         duration_str = duration_str + f"{minutes} min"
     return duration_str
+
 
 class Tag(models.Model):
     BRIGHT = 'rgb(253, 246, 227)'
@@ -117,9 +119,6 @@ class Recipe(models.Model):
     def tags_sorted(self):
         return self.tags.order_by('pk')
 
-    def pictures_sorted(self):
-        return self.picture_set.order_by('order')
-    
 
 class Ingredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
@@ -149,9 +148,11 @@ class Direction(models.Model):
 
 class Picture(models.Model):
     PICTURE_ROOT = 'recipes_img'
+    THUMBNAIL_ROOT = 'recipes_tmb'
 
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to=PICTURE_ROOT)
+    image = models.ImageField(upload_to=PICTURE_ROOT, null=False, blank=False)
+    thumbnail = models.ImageField(upload_to=THUMBNAIL_ROOT, null=False, blank=True)
     order = models.IntegerField(default=0)
     description = models.CharField(max_length=255, blank=True, default='')
     
@@ -160,22 +161,69 @@ class Picture(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            self.image.name = self.get_file()
+            self.thumbnail = self.make_thumbnail(self.image.file)
+            name = self._get_filename()
+            self.image.name = name
+            self.thumbnail.name = name
+        else:
+            # Todo: check if the image has change and raise if so
+            pass
 
-        super(Picture, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
         self.image.delete(save=False)
+        self.thumbnail.delete(save=False)
         super().delete(using=using, keep_parents=keep_parents)
 
-    def get_file(self):
+    def _get_filename(self):
         if self.id:
-            raise RuntimeError('Not safe to call get_file after object has been saved')
+            raise RuntimeError('Not safe to call _get_filename after object has been saved')
 
         recipe_id = f'{self.recipe_id:04d}'
         random_slug = get_slug(8)
         extension = self.image.file.content_type.split('/')[1]
         return f'{recipe_id}_{random_slug}.{extension}'
+
+    THUMBNAIL_HEIGHT_RATIO = 0.55
+    THUMBNAIL_WIDTH = 540
+
+    def make_thumbnail(self, file):
+        """
+        :rtype: django.db.models.fields.files.ImageFieldFile
+        """
+        from PIL import Image
+        from io import BytesIO
+        from django.core.files.base import ContentFile
+
+        image = Image.open(file)
+        image.load()
+        file_type = image.format
+        image = image.copy()
+
+        w, h = self.THUMBNAIL_WIDTH, self.THUMBNAIL_HEIGHT_RATIO * self.THUMBNAIL_WIDTH
+
+        image = self.crop_to_ratio(image, w / h)
+        image.thumbnail((w, h))
+
+        buffer = BytesIO()
+        image.save(buffer, format=file_type)
+        return ContentFile(buffer.getbuffer())
+
+    @staticmethod
+    def crop_to_ratio(image, ratio):
+        W, H = 1, 1 / ratio
+        w, h = image.size
+
+        r = min(w, h/H)
+        w1, h1 = r * W, r * H
+        x0, y0 = (w - w1) / 2, (h - h1) / 2
+        x1, y1 = x0 + w1, y0 + h1
+
+        box = (x0, y0, x1, y1)
+        box = [round(dim) for dim in box]
+
+        return image.crop(box)
 
     def b64image(self):
         import base64
@@ -203,5 +251,11 @@ class Collection(models.Model):
 
         return super(Collection, self).save(*args, **kwargs)
 
+    def get_display_slug(self):
+        return slugify(self.name)
+
     def get_absolute_url(self):
-        return reverse('recipes:collection_detail', kwargs={'pk': self.pk})
+        return reverse('recipes:collections:detail', kwargs={'pk': self.pk, 'slug': self.get_display_slug()})
+
+    def get_public_url(self):
+        return reverse('recipes:collections:public', kwargs={'slug': self.public_slug})

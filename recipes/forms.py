@@ -123,3 +123,35 @@ PictureFormSet = inlineformset_factory(
     can_order=True,
     form=PictureForm,
 )
+
+
+class SearchForm(forms.Form):
+    search_string = forms.CharField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tags = Tag.objects.order_by('pk')
+        self.fields.update({
+            f'tag.{tag.name}': forms.NullBooleanField(required=False) for tag in self.tags
+        })
+        self.search_params = {}
+
+    def is_valid(self):
+        valid = super().is_valid()
+        fields = dict(self.cleaned_data)
+        search_params = {}
+
+        search_string = fields.pop('search_string')
+        if search_string:
+            search_params['search_string'] = search_string
+
+        tags = {
+            tag.split('.')[-1]: instruction
+            for tag, instruction in fields.items()  # search_string was popped, only tags should remain
+            if instruction is not None
+        }
+        if tags:
+            search_params['tags'] = tags
+
+        self.search_params = search_params
+        return valid

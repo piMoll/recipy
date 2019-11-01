@@ -1,6 +1,19 @@
-{% extends 'base.html' %}
+{% extends 'recipes/collection_base.html' %}
 
 {% block title %}Collection: {{ collection.name }}{% endblock %}
+
+
+{% block header-right %}
+<div class="header-button button-share">
+    <a href="{{ collection.get_public_url }}"></a>
+</div>
+{% if perms.collection.change_collection %}
+<div class="header-button button-edit">
+    <a href="{% url 'recipes:collections:edit' pk=collection.pk %}"></a>
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}
 
 
 {% block header-after %}

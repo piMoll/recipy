@@ -1,35 +1,7 @@
 'use strict';
 
 (function () {
-    function ownProps(object) {
-        return Object.keys(object).map(key => object[key]);
-    }
-
-    const MAX_32_BIT = Math.pow(2, 32);
-    function tid() {
-        const num = Math.floor(Math.random() * MAX_32_BIT);
-        return ('00000000' + num.toString(16)).substr(-8);
-    }
-
-    function b64toBlob(b64Data, contentType='', sliceSize=512) {
-        const byteCharacters = atob(b64Data);
-        const byteArrays = [];
-
-        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-            const slice = byteCharacters.slice(offset, offset + sliceSize);
-
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-        }
-
-        const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-        }
-
-        const blob = new Blob(byteArrays, {type: contentType});
-        return blob;
-    }
+    const {ownProps, tid, b64toBlob, post} = window.recipyUtil;
 
     const {ContainerMixin, ElementMixin, SlickList, HandleDirective} = window.VueSlicksort;
 
@@ -38,16 +10,6 @@
         return (event.type === 'touchstart') || shouldCancelStart(event);
     }
     ContainerMixin.props.shouldCancelStart.default = isTouch;
-
-    const TemplateDataPropsMixin = {
-        beforeCreate() {
-            const el = document.querySelector(this.$options.el);
-            this.$options.propsData = {
-                ...el.dataset,
-                ...this.$options.propsData,
-            }
-        }
-    };
 
     const ErrorPopup = {
         template: `
@@ -391,7 +353,7 @@
                     if (!group) return;
                     group.order = order++;
                 });
-                this.renumberForms();
+                this.reorderItems();
             },
             renumberForms() {
                 let forms = 0;
@@ -871,42 +833,9 @@
         },
     };
 
-    const FormSubmit = {
-        name: 'FormSubmit',
-        mixins: [TemplateDataPropsMixin],
-        template: `
-<button
-  class="icon"
-  @click="onClick"
-></button>`,
-        props: ['form',],
-        methods: {
-            async onClick() {
-                const form = document.getElementById(this.form);
-                const formData = new FormData(form);
-                const action = form.action;
-                const method = form.method;
-                const options = {
-                    method: method,
-                    body: formData,
-                    headers: {
-                        Accept: 'application/json'
-                    },
-                };
-                const request = fetch(action, options);
-                const response = await request.then(r => r.json());
-                if (response.success)
-                    window.location = response.location;
-                else
-                    Object.keys(response.errors).forEach(error => this.$emit(error, response.errors[error]));
-            }
-        }
-    };
-
     window.recipeCreate = {
         IngredientFormset: Vue.extend(IngredientFormset),
         DirectionFormset: Vue.extend(DirectionFormset),
         PictureFormset: Vue.extend(PictureFormset),
-        FormSubmit: Vue.extend(FormSubmit),
     };
 })();
