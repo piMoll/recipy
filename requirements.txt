@@ -4,7 +4,7 @@ attrs==19.1.0
 beautifulsoup4==4.7.1
 certifi==2019.3.9
 chardet==3.0.4
-Django==2.2.1
+Django==2.2.8
 idna==2.8
 multidict==4.5.2
 Pillow==6.0.0
