@@ -9,6 +9,7 @@ from django.views.generic import View, ListView, RedirectView, TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 
+from .logger import logger
 from .models import Tag, Recipe, Collection
 from .forms import RecipeCreateForm, IngredientFormSet, DirectionFormSet, PictureFormSet, SearchForm
 from .templatetags.recipes import recipe_vuemodel
@@ -40,7 +41,7 @@ def create(request, pk=None):
     direction_formset = None
     recipe = None  # type: Recipe or None
     close_url = reverse('recipes:search')
-    accept_json = request.headers['Accept'] == 'application/json'
+    accept_json = True  # we're only making "rest"-style requests anyway
 
     if pk is not None:
         recipe = get_object_or_404(Recipe, pk=pk)
@@ -97,6 +98,7 @@ def create(request, pk=None):
                     'direction_formset': direction_formset,
                 }
                 errors = {name: form.errors for name, form in forms.items() if not form.is_valid()}
+                logger.info('tried to POST recipe: %s', str(errors))
                 return JsonResponse({
                     'success': False,
                     'errors': errors,
@@ -185,6 +187,7 @@ class SearchView(LoginRequiredMixin, View):
             }
             status = {}
         else:
+            logger.info('tried to GET recipe: %s', search_form.errors)
             response = {
                 'success': False,
                 'errors': search_form.errors,
@@ -231,6 +234,7 @@ class CollectionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
+        logger.info('tried to POST collection: %s', form.errors)
         accept_json = self.request.headers['Accept'] == 'application/json'
         if accept_json:
             return JsonResponse({
