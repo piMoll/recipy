@@ -22,11 +22,11 @@ def search_recipes(search_string=None, tags=None):
             from django.contrib.postgres.aggregates import StringAgg
             from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
             
-            search_v = SearchVector('title', weight='B') \
-                       + SearchVector(StringAgg('ingredient__name', delimiter=' '), weight='C') \
-                       + SearchVector(StringAgg('direction__description', delimiter=' '), weight='C')
+            search_v = SearchVector('title', weight='B', config='german') \
+                       + SearchVector(StringAgg('ingredient__name', delimiter=' '), weight='C', config='german') \
+                       + SearchVector(StringAgg('direction__description', delimiter=' '), weight='C', config='german')
             
-            terms = [SearchQuery(term + ':*', search_type='raw') for term in search_string.split()]
+            terms = [SearchQuery(term + ':*', search_type='raw', config='german') for term in search_string.split()]
             search_q = terms[0]
             for sq in terms[1:]:
                 search_q &= sq
