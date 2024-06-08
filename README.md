@@ -11,7 +11,7 @@
 - **Sauce:** Saucen, Dips, Marinaden, sowie Rezepte, die einfach eine Sauce enthalten.
 - **Drink:** Allgemeine Getränke und Cocktails.
 - **Tapas:** Alles, was als Vorspeise, Apero, Brunch, Mitbringsel oder Fingerfood serviert werden kann.
-- **einfach:** Schnelle und unkomplizierte Gerichte. Kann auch deftig sein, nicht verwechseln mit Leicht.
+- **schnell:** Schnelle und unkomplizierte Gerichte. Kann auch deftig sein, nicht verwechseln mit Leicht.
 - **leicht:** Für den kleinen Hunger; Kalorienarm. 
 - **unvollständig:** Wurden automatisch importiert und noch nicht kontrolliert, fehlende Tags oder Bilder.
 - **ungetestet:** Rezepte, die wir noch nicht probiert haben.

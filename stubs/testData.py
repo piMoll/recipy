@@ -25,7 +25,7 @@ def createTestData():
         )
         
         recipe.tags.add(Tag.objects.get(name='hauptgericht'),
-                        Tag.objects.get(name='einfach'),
+                        Tag.objects.get(name='schnell'),
                         Tag.objects.get(name='favorit'))
     
     ingredients = Ingredient.objects.filter(recipe=recipe)
