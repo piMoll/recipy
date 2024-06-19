@@ -117,7 +117,7 @@
 
 {% block header-left %}
 <div class="header-button button-close">
-    <a href="{% if recipe_form.instance %}{{ instance.get_absolute_url }}{% else %}{% url 'recipes:search' %}{% endif %}"></a>
+    <a href="{% if close_url %}{{ close_url }}{% else %}{% url 'recipes:search' %}{% endif %}"></a>
 </div>
 {% endblock %}
 
