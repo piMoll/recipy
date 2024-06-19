@@ -4,7 +4,8 @@ import re
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 
 def get_slug(length):
     return '{slug:0{length}x}'.format(length=length,
@@ -92,6 +93,10 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     creationdate = models.DateField()
     public_slug = models.CharField(max_length=10, unique=True, null=False)
+    search_vector = SearchVectorField(null=True)
+    
+    class Meta:
+        indexes = (GinIndex(fields=["search_vector"]),)
     
     def __str__(self):
         return self.title
@@ -126,9 +131,11 @@ class Ingredient(models.Model):
     name = models.CharField(max_length=255)
     group = models.CharField(max_length=100, blank=True, default='')
     order_item = models.IntegerField()
+    search_vector = SearchVectorField(null=True)
     
     class Meta:
         ordering = ['order_item']
+        indexes = (GinIndex(fields=["search_vector"]),)
     
     def __str__(self):
         return f'{self.quantity} {self.name}'
@@ -138,9 +145,11 @@ class Direction(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     step = models.IntegerField()
     description = models.TextField()
+    search_vector = SearchVectorField(null=True)
     
     class Meta:
         ordering = ['step']
+        indexes = (GinIndex(fields=["search_vector"]),)
     
     def __str__(self):
         return f'{self.step}. {self.description}'
@@ -166,7 +175,7 @@ class Picture(models.Model):
             self.image.name = name
             self.thumbnail.name = name
         else:
-            # Todo: check if the image has change and raise if so
+            # Todo: check if the image has changed and raise if so
             pass
 
         super().save(*args, **kwargs)
