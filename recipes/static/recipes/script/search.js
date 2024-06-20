@@ -23,12 +23,15 @@
         name: 'SearchWidget',
         template: `
 <div class="recipe-search">
-    <input
-      class="search-string"
-      type="text"
-      placeholder="Nach Rezept, Zutat, etc. suchen"
-      v-model="searchString"
-    >
+    <div class="search-bar">
+        <input
+          class="search-string"
+          type="text"
+          placeholder="Nach Rezept, Zutat, etc. suchen"
+          v-model="searchString"
+        >
+        <span :class="{spinner: true, active: searching}"></span>
+    </div>
 
     <div class="search-tags">
         <RecipeTag
@@ -77,6 +80,7 @@
                 fetch: null,
                 skipSubmit: false,
                 delay: 400,
+                searching: false,
             }
         },
         created() {
@@ -114,11 +118,13 @@
                 const qs = this.querystring();
                 if (!qs) return;
 
+                this.searching = true;
                 const request = fetch(this.endpoint + '?' + qs);
                 this.fetch = request;
 
                 const response = await this.fetch;
-                if (this.fetch !== request) return;
+                if (this.fetch !== request) return; // this is no longer the most recent call
+                this.searching = false;
 
                 const json = await response.json();
                 this.recipes_ = json.recipes;

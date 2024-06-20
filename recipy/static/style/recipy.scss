@@ -1,4 +1,3 @@
-
 $color-accent-bright: #f7f7ee;
 $color-accent-dark: #1a4854;
 $color-accent-darker: #063540;
@@ -38,9 +37,11 @@ $page-gutter-width: 900px;
 
 /////////////// recipe_detail ///////////////
 
-.recipe {}
+.recipe {
+}
 
-.recipe-header {}
+.recipe-header {
+}
 
 .title {
     font-size: 1.8rem;
@@ -57,6 +58,7 @@ $page-gutter-width: 900px;
 
 .image {
     margin: 0 -5px;
+
     img {
         width: 100%;
         max-height: 320px;
@@ -175,10 +177,12 @@ $page-gutter-width: 900px;
             font-weight: bold;
             border-bottom-width: 0;
             border-top-width: 1px;
+
             &:first-child {
                 border-top-right-radius: 5px;
                 border-right-width: 1px;
             }
+
             &:not(:first-child) {
                 border-top-left-radius: 5px;
                 border-left-width: 1px;
@@ -223,10 +227,12 @@ $page-gutter-width: 900px;
     }
 }
 
-.ingredient-portion {}
+.ingredient-portion {
+}
 
 .ingredient-details {
 }
+
 .ingredient-list {
     margin: 1rem 0;
     padding-left: 1.2rem;
@@ -255,7 +261,8 @@ $page-gutter-width: 900px;
     font-weight: bold;
 }
 
-.ingredient-name {}
+.ingredient-name {
+}
 
 .nutrition {
     margin: 2rem 0 3rem 0;
@@ -289,13 +296,16 @@ $page-gutter-width: 900px;
     display: flex;
     margin: 1.2rem 0;
 }
+
 .direction-step {
     line-height: 1;
     font-size: 1.4rem;
     font-weight: normal;
     margin: 0 0.7rem 0 0;
 }
-.direction-text {}
+
+.direction-text {
+}
 
 
 .recipe-notes {
@@ -359,7 +369,7 @@ $recipe-list-margin: 5px;
     background-color: $color-accent-bright;
     margin: 0 $recipe-list-margin 2*$recipe-list-margin;
 
-    box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.3);
+    box-shadow: 2px 2px 5px -1px rgba(0, 0, 0, 0.3);
 
     @media screen and (min-width: 768px) {
         margin: 0 2*$recipe-list-margin 4*$recipe-list-margin;
@@ -429,6 +439,7 @@ $recipe-list-desc-lh: 21px;
     }
 }
 
+
 /////////////// page_header ///////////////
 
 $appbar-icon-dimensions: 24px;
@@ -441,6 +452,7 @@ $appbar-padding-desktop: 18px;
 
 .page-header {
     background-color: $color-accent-dark;
+
     &, a {
         color: $color-icon-font;
     }
@@ -561,9 +573,11 @@ $appbar-padding-desktop: 18px;
 
 .search {
     padding-bottom: 12px;
+
     h1 {
         display: none;
     }
+
     @media screen and (min-width: 768px) {
         h1 {
             display: block;
@@ -577,9 +591,15 @@ $appbar-padding-desktop: 18px;
     margin-bottom: 16px;
 }
 
+.search-bar {
+    width: 100%;
+    margin-bottom: 16px;
+    position: relative;
+}
+
 .search-string {
     border: none;
-    padding: 8px 16px;
+    padding: 8px 46px 8px 16px;
     line-height: 30px;
     display: block;
     width: 100%;
@@ -587,7 +607,6 @@ $appbar-padding-desktop: 18px;
     color: $color-accent-darker;
     font-size: 1.2rem;
     background-color: $color-accent-bright;
-    margin-bottom: 16px;
 }
 
 .search-submit {
@@ -623,6 +642,34 @@ $appbar-padding-desktop: 18px;
 
 .exclude-tag {
     @include exclude-tag;
+}
+
+.spinner {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    width: 30px;
+    height: 30px;
+    border: 5px solid #444;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: none;
+    box-sizing: border-box;
+    animation: spinner-rotation 1s linear infinite;
+
+    &.active {
+        display: inline-block;
+    }
+}
+
+@keyframes spinner-rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /////////////// recipe_create ///////////////
@@ -947,28 +994,29 @@ $create-image-button-height: 125px;
 }
 
 
-
 /////////////// collection_recipe_list ///////////////
-
 
 
 .collection_recipe_list {
     .recipe-list-overflow {
         justify-content: flex-start;
     }
+
     .recipe-list-gutter {
         flex-basis: 200px;
         max-width: 220px;
     }
+
     .recipe-list-item {
         margin: 0 7px;
     }
+
     .recipe-list-name {
         font-size: 12px;
         line-height: 13px;
     }
+
     .recipe-list-tags {
         display: none;
     }
 }
-

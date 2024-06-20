@@ -31,15 +31,15 @@
 
 <script type="text/javascript">
     (function () {
+        const { RecipeList, SearchWidget } = window.recipeSearch;
         const recipeData = JSON.parse(document.getElementById('init-recipes').textContent);
-        const searchResults = new window.recipeSearch.RecipeList({
+        const searchData = JSON.parse(document.getElementById('init-search').textContent);
+        const searchResults = new RecipeList({
             el: '#search-results',
             propsData: {
                 recipes: recipeData,
             }
         });
-        const searchData = JSON.parse(document.getElementById('init-search').textContent);
-        const SearchWidget = window.recipeSearch.SearchWidget;
         const searchWidget = new SearchWidget({
             el: '#recipe-search',
             propsData: {
@@ -59,49 +59,12 @@
 <div class="gutter search">
     <h1>Rezeptsuche</h1>
 
-    <div id="recipe-search">
-        <form method="get">
-            <input class="search-string" type="text" name="search_string" value="{{ search_string }}" placeholder="Nach Rezept, Zutat, etc. suchen">
-
-            {# persist tags if search_string changes #}
-            {% for tag, _ , state in tag_list %}
-                {% if state %}
-                    <input type="hidden" name="tag.{{ tag.name }}" value="{{ state }}">
-                {% endif %}
-            {% endfor %}
-
-            <input class="search-submit" type="submit" value="Suchen"/>
-        </form>
-
-        <div class="search-tags">
-            {% for tag, query, state in tag_list %}{% spaceless %}
-                <a style="color:{{ tag.font }};background-color:{{ tag.color }};"
-                   href="?{{ query }}"
-                   class="tag{% if state == 'y' %} include-tag{% elif state == 'n' %} exclude-tag{% endif %}">
-                    {{ tag.name }}
-                </a>
-            {% endspaceless %}{% endfor %}
-
-            {% if reset_tags %}
-                <a style="color:white;background-color:red;"
-                   href="?{{ reset_tags }}"
-                   class="tag">
-                    Tags zurücksetzen
-                </a>
-            {% endif %}
-        </div>
-    </div>
+    <div id="recipe-search"></div>
 </div>
 {% endblock %}
 
 
 {% block content %}
-<div id="search-results" class="gutter search-results">
-    {% if recipes %}
-        {% include 'recipes/recipe_list.html' with recipe_list=recipes %}
-    {% else %}
-        <h3>Keine Rezepte gefunden :(</h3>
-    {% endif %}
-</div>
+<div id="search-results" class="gutter search-results"></div>
 {% endblock %}
 
