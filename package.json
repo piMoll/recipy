@@ -1,0 +1,6 @@
+{
+  "name": "recipy",
+  "dependencies": {
+    "sass": "^1.77.6"
+  }
+}
