@@ -16,6 +16,43 @@
 - **unvollständig:** Wurden automatisch importiert und noch nicht kontrolliert, fehlende Tags oder Bilder.
 - **ungetestet:** Rezepte, die wir noch nicht probiert haben.
 
+## Deployment
+
+```shell
+git clone git@github.com:piMoll/recipy && cd recipy # only for the first time
+git pull # from the second time on
+
+# get correct python
+. venv-source
+
+# check migrations before apply
+./manage.py showmigrations
+
+# disable site
+sudo a2dissite rezeptbue.ch
+sudo systemctl restart apache2
+
+# stop workers
+sudo systemctl stop rezeptbuech
+
+# apply migrations
+./manage.py migrate
+
+# restart workers
+sudo systemctl start rezeptbuech
+
+# reenable site
+sudo a2ensite rezeptbue.ch
+sudo systemctl restart apache2
+```
+
+If no migrations are necessary, it should be fine to just restart the workers:
+
+```shell
+git pull
+sudo systemctl restart rezeptbuech
+```
+
 ## Development
 
 ### Database
