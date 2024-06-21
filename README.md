@@ -15,3 +15,49 @@
 - **leicht:** Für den kleinen Hunger; Kalorienarm. 
 - **unvollständig:** Wurden automatisch importiert und noch nicht kontrolliert, fehlende Tags oder Bilder.
 - **ungetestet:** Rezepte, die wir noch nicht probiert haben.
+
+## Development
+
+### Database
+
+```postgresql
+create database recipy;
+
+create user django with password '****' createdb; -- sync with recipy/settings.py
+```
+
+### Requirements
+
+```shell
+sudo apt install libpython-dev libpq-dev
+python -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+./manage.py showmigrations # check if everything is okay
+./manage.py migrate
+```
+
+### Persist new python packages
+
+```shell
+pip freeze -l --exclude typing_extensions > requirements.txt
+```
+
+### Tests
+
+```shell
+./manage.py test
+```
+
+### Sync DB
+
+```shell
+ssh -t rezeptbue.ch sudo -u postgres pg_dump -c rezeptbuech > db_rezeptbuech_$(date -uI).sql
+psql -h localhost -d recipy -u django < db_rezeptbuech_$(date -uI).sql
+```
+
+### Sync Media Uploads
+
+```shell
+scp -r rezeptbue.ch:/var/www/rezeptbue.ch/media media
+```
