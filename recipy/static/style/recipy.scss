@@ -521,10 +521,6 @@ $appbar-padding-desktop: 18px;
     background-image: url("../images/home_" + $color-icon-font + ".png");
 }
 
-.button-import a:after {
-    background-image: url("../images/crawler_" + $color-icon-font + ".png");
-}
-
 .button-create a:after {
     background-image: url("../images/create_" + $color-icon-font + ".png");
 }

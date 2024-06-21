@@ -479,10 +479,6 @@ body {
   background-image: url("../images/home_white.png");
 }
 
-.button-import a:after {
-  background-image: url("../images/crawler_white.png");
-}
-
 .button-create a:after {
   background-image: url("../images/create_white.png");
 }

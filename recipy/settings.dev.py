@@ -34,7 +34,6 @@ if os.getenv('HOST', None):
 
 INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
-    'crawler.apps.CrawlerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -83,10 +82,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'recipy',
         'USER': 'django',
-        'PASSWORD': '****',
+        'PASSWORD': 'chuchichäschtli',
         'HOST': 'localhost',
         'PORT': '',
-        
+
     }
 }
 

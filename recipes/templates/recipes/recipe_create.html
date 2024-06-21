@@ -126,11 +126,6 @@
 <div class="header-button button-save">
     <input id="save" class="icon" type="submit" form="create-recipe" data-form="create-recipe"/>
 </div>
-{% if perms.recipes.add_recipe %}
-<div class="header-button button-import">
-    <a href="{% url 'crawler:index' %}"></a>
-</div>
-{% endif %}
 {% endblock %}
 
 
