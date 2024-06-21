@@ -18,9 +18,16 @@
 
 ## Deployment
 
+### Get updates
+
 ```shell
 git clone git@github.com:piMoll/recipy && cd recipy # only for the first time
 git pull # from the second time on
+```
+
+### Migrations
+
+```shell
 
 # get correct python
 . venv-source
@@ -46,11 +53,19 @@ sudo a2ensite rezeptbue.ch
 sudo systemctl restart apache2
 ```
 
-If no migrations are necessary, it should be fine to just restart the workers:
+### Code or Template
 
 ```shell
 git pull
 sudo systemctl restart rezeptbuech
+```
+
+### Static files
+
+```shell
+git pull
+. venv-source
+./manage.py collectstatic
 ```
 
 ## Development
