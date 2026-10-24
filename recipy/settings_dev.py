@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'recipy',
         'USER': 'django',
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': 'localhost',
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': '',
 
     }
