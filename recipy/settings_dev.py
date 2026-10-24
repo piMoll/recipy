@@ -20,14 +20,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'l(4kus0(49woz9vi8j&*n(!!ngne2h#w=3lztlw*mp)h#or6vi'
+SECRET_KEY = os.getenv('SECRET_KEY', 'change-me-to-a-random-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
-if os.getenv('HOST', None):
-    ALLOWED_HOSTS.append(os.getenv('HOST'))
+ALLOWED_HOSTS = ['localhost', os.getenv('HOST', 'localhost')]
 
 
 # Application definition
@@ -82,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'recipy',
         'USER': 'django',
-        'PASSWORD': 'chuchichäschtli',
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': 'localhost',
         'PORT': '',
 
@@ -118,8 +116,6 @@ TIME_ZONE = 'Europe/Zurich'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 
@@ -137,6 +133,10 @@ STATICFILES_DIRS = (
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 FILE_UPLOAD_PERMISSIONS = 0o644
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
