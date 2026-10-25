@@ -17,7 +17,7 @@ services:
 
   web:
     build: .
-    command: gunicorn -w 8 recipy.wsgi:application --bind 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
     environment:
       DJANGO_SETTINGS_MODULE: recipy.settings
       SECRET_KEY: ${SECRET_KEY}
@@ -26,6 +26,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - .:/app
       - media:/app/media
     depends_on:
       db:
