@@ -9,9 +9,12 @@ class TagSelectWidget(CheckboxSelectMultiple):
 
     def create_option(self, *args, **kwargs):
         option = super().create_option(*args, **kwargs)
-        option.update(
-            model=Tag.objects.get(pk=option['value']),
-        )
+        # Only query the database when the value is a valid PK
+        value = option['value']
+        if value is not None and isinstance(value, int):
+            option.update(
+                model=Tag.objects.get(pk=value),
+            )
         return option
 
 
